@@ -7,5 +7,10 @@ v asd string = RSMath[FUNCTIONS]
 ## FPS: how many times PROCESS runs per second
 c FPS float = 30.0
 
-PROCESS(FPS):
-	print_cmd("FPS: " + FPS.string())
+##PROCESS(FPS):
+##pass
+##	print_cmd("FPS: " + FPS.string())
+
+START():
+	print_cmd(RSMath[VARIABLES])
+	print_cmd("PI: " + str(RSMath[PI]))

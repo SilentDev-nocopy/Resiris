@@ -1,0 +1,21 @@
+Usage:
+
+<include> RSBase
+
+fn function_name():
+    print_cmd("asd")
+
+v timer ModuleObject = RSBase.await
+timer.set_timer(seconds).on_timeout(function_name) <- it makes, starts and sets the given function starting on the timer's timeout.
+timer.reset_timer() <- resets itself
+timer.stop_timer() <- stops itself
+timer.free_timer() <- destroys itself
+
+
+
+START():
+	print_cmd(RSBase)
+
+PROCESS(FPS):
+	print_cmd(timer.process)
+
