@@ -13,6 +13,9 @@ env/
 .mypy_cache/
 .ruff_cache/
 
+# Zed stuff
+.zed/
+
 # Build / packaging
 build/
 dist/
