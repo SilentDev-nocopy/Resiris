@@ -9,8 +9,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 OUT = ROOT / "build"
 STAGING = OUT / "extension"
-VERSION = "0.4.4"
+VERSION = "0.5.0"
 EXTENSION_ID = "resiris-language-support"
+
+MODULES_DIR = ROOT.parents[1] / "Modules"
+sys.path.insert(0, str(ROOT))
+from module_metadata import generate_modules_metadata
 
 cands = [
     Path("/usr/share/code/resources/app/extensions/theme-seti/icons"),
@@ -52,6 +56,15 @@ if STAGING.exists():
 (STAGING / "snippets").mkdir(parents=True)
 (STAGING / "themes").mkdir(parents=True)
 OUT.mkdir(exist_ok=True)
+
+modules_metadata = generate_modules_metadata(MODULES_DIR)
+(STAGING / "modules.json").write_text(
+    json.dumps(modules_metadata, indent=2) + "\n", encoding="utf-8"
+)
+if MODULES_DIR.is_dir():
+    (ROOT / "modules.json").write_text(
+        json.dumps(modules_metadata, indent=2) + "\n", encoding="utf-8"
+    )
 
 for filename in ("package.json", "language-configuration.json", "extension.js"):
     shutil.copy2(ROOT / filename, STAGING / filename)

@@ -2,10 +2,12 @@ import json
 import zipfile
 from pathlib import Path
 
+from pre_packaging.vscode.module_metadata import generate_modules_metadata
+
 
 ROOT = Path(__file__).resolve().parents[1]
 VSCODE = ROOT / "pre_packaging" / "vscode"
-VSIX = VSCODE / "build" / "resiris-language-support-0.4.3.vsix"
+VSIX = VSCODE / "build" / "resiris-language-support-0.5.0.vsix"
 
 
 def test_extension_manifest_declares_resy_language_and_icon_theme():
@@ -97,6 +99,75 @@ def test_completion_provider_handles_lifecycle_and_fps():
     assert "registerCompletionItemProvider" in source
 
 
+def test_extension_reports_missing_includes_and_offers_quick_fix():
+    source = (VSCODE / "extension.js").read_text(encoding="utf-8")
+
+    assert "createDiagnosticCollection" in source
+    assert "registerCodeActionsProvider" in source
+    assert "resiris.missing-include" in source
+    assert "Used but not included".lower() in source.lower() or "not included" in source
+    assert "Add <include>" in source
+    assert "insertIncludesEdit" in source
+    assert "DiagnosticSeverity.Warning" in source
+    assert "getIncludedModules" in source
+    assert "findMissingModuleUses" in source
+
+
+def test_module_registry_in_sync_with_python_modules():
+    registry = json.loads((VSCODE / "modules.json").read_text(encoding="utf-8"))
+    generated = generate_modules_metadata(ROOT / "Modules")
+
+    assert registry == generated
+    assert registry["version"] == 1
+
+    by_name = {module["name"]: module for module in registry["modules"]}
+    assert by_name["RSBase"]["functions"] == [
+        "await",
+        "set_timer",
+        "on_timeout",
+        "reset_timer",
+        "stop_timer",
+        "free_timer",
+        "process",
+    ]
+    assert "sqrt" in by_name["RSMath"]["functions"]
+    assert {"name": "PI", "type": "float"} in by_name["RSMath"]["variables"]
+    assert by_name["RSMath"]["documentation"]
+
+
+def test_module_completions_are_context_aware():
+    source = (VSCODE / "extension.js").read_text(encoding="utf-8")
+
+    assert "CompletionItemKind.Module" in source
+    assert "CompletionItemKind.Function" in source
+    assert "CompletionItemKind.Constant" in source
+    assert "m.name.toLowerCase().startsWith(prefix" in source
+    assert "match.index" in source
+
+
+def test_completions_are_gated_by_line_context():
+    source = (VSCODE / "extension.js").read_text(encoding="utf-8")
+
+    assert "scanLine" in source
+    assert "isStatementStart" in source
+    assert "accessCompletions" in source
+    assert "resolveObjectModule" in source
+    assert "expressionItems" in source
+    assert "statementItems" in source
+    assert "replaceRange" in source
+    assert "ModuleObject" in source
+    assert "parenthesis" in source.lower() or "parenDepth" in source
+    assert "preselect" in source
+
+
+def test_completion_is_triggered_only_in_context():
+    source = (VSCODE / "extension.js").read_text(encoding="utf-8")
+
+    # Letters are deliberately NOT trigger characters: an always-open widget
+    # matched every snippet at word boundaries and let a stray Tab expand one.
+    assert 'const TRIGGER_CHARS = [".", "[", ">"];' in source
+
+
 def test_theme_gives_every_resiris_scope_its_own_color():
     grammar = json.loads(
         (VSCODE / "syntaxes" / "resiris.tmLanguage.json").read_text(encoding="utf-8")
@@ -142,6 +213,7 @@ def test_built_vsix_contains_language_support_files():
     expected = {
         "extension/package.json",
         "extension/extension.js",
+        "extension/modules.json",
         "extension/language-configuration.json",
         "extension/syntaxes/resiris.tmLanguage.json",
         "extension/snippets/resiris.json",

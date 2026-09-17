@@ -1,1 +1,14 @@
-<include> ModuleName>
+
+v asd ModuleObject = <include> RSBase
+
+fn on_done():
+	print_cmd("timer done")
+
+v timer ModuleObject = RSBase.await
+
+START():
+	timer.set_timer(1.0).on_timeout(on_done)
+
+c FPS float = 60.0
+PROCESS(FPS):
+	print_cmd(timer.process)

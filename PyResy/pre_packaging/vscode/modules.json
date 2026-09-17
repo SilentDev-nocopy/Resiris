@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "modules": [
+    {
+      "name": "RSBase",
+      "functions": [
+        "await",
+        "set_timer",
+        "on_timeout",
+        "reset_timer",
+        "stop_timer",
+        "free_timer",
+        "process"
+      ],
+      "variables": [],
+      "documentation": "Real-time base module for object scheduling: timers (await, set_timer, on_timeout, reset_timer, stop_timer, free_timer) and per-frame process()."
+    },
+    {
+      "name": "RSMath",
+      "functions": [
+        "abs",
+        "sqrt",
+        "cbrt",
+        "pow",
+        "floor",
+        "ceil",
+        "round",
+        "ln",
+        "log10",
+        "sin",
+        "cos",
+        "tan",
+        "asin",
+        "acos",
+        "atan",
+        "hypot",
+        "factorial",
+        "ncr",
+        "npr",
+        "gcd",
+        "lcm",
+        "mod",
+        "min",
+        "max",
+        "clamp",
+        "is_nan",
+        "is_inf",
+        "is_finite",
+        "pythagoras"
+      ],
+      "variables": [
+        {
+          "name": "PI",
+          "type": "float"
+        },
+        {
+          "name": "E",
+          "type": "float"
+        }
+      ],
+      "documentation": "Math module: trigonometry, powers and roots, rounding, statistics, number classification and the PI/E constants."
+    }
+  ]
+}
