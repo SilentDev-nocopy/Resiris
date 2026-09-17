@@ -85,7 +85,7 @@
       "patterns": [
         {
           "name": "storage.type.resiris",
-          "match": "\\b(?:UnknownObject|int|float|string|bool|ResirisModuleObject|FunctionalObject)\\b"
+          "match": "\\b(?:UnknownObject|int|float|string|bool|ModuleObject|FunctionalObject)\\b"
         }
       ]
     },

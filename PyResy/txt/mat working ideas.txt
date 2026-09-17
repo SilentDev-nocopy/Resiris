@@ -22,7 +22,7 @@ What is the "mat" statement?
 5. Which types can be used as the value checked by "mat"?
         int, float, string, bool and any other type.
 
-6. Can a "mat" check a ResirisModuleObject value?
+6. Can a "mat" check a ModuleObject value?
         Yes
 
 7. Can a "mat" check an UnknownObject value?
@@ -238,7 +238,7 @@ The checked value may be:
 - float
 - string
 - bool
-- ResirisModuleObject
+- ModuleObject
 - any other defined Resiris type
 
 UnknownObject cannot be used as the checked value.

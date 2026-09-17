@@ -40,7 +40,7 @@ class TokenType(Enum):
     TYPE_FLOAT = auto()
     TYPE_STRING = auto()
     TYPE_BOOL = auto()
-    TYPE_RESIRIS_MODULE_OBJECT = auto()
+    TYPE_MODULE_OBJECT = auto()
     TYPE_FUNCTIONAL_OBJECT = auto()
 
     # Operators
@@ -95,7 +95,7 @@ KEYWORDS = {
     "float": TokenType.TYPE_FLOAT,
     "string": TokenType.TYPE_STRING,
     "bool": TokenType.TYPE_BOOL,
-    "ResirisModuleObject": TokenType.TYPE_RESIRIS_MODULE_OBJECT,
+    "ModuleObject": TokenType.TYPE_MODULE_OBJECT,
     "FunctionalObject": TokenType.TYPE_FUNCTIONAL_OBJECT,
 }
 
@@ -130,7 +130,7 @@ class Tokenizer:
       - if / elif / else
       - return / pass / mat / print_cmd / print_cmd
       - arithmetic/comparison/assignment operators
-      - int / float / string / bool / UnknownObject / ResirisModuleObject
+      - int / float / string / bool / UnknownObject / ModuleObject
       - strings in single or double quotes
 
     `await` is a planned future feature and is not part of the current syntax.

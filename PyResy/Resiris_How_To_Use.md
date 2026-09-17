@@ -49,7 +49,7 @@ The currently defined Resiris types are:
 - `float`
 - `string`
 - `bool`
-- `ResirisModuleObject`
+- `ModuleObject`
 - `FunctionalObject`
 
 An `UnknownObject` receives its type when its first value is assigned.

@@ -192,7 +192,7 @@ Resiris.print():
     variant and then called through that variant.
 
     Example:
-        v print ResirisModuleObject = Resiris.print()
+        v print ModuleObject = Resiris.print()
         print("Hello World")
         print(str(test_value))
         print(test_value)
@@ -208,8 +208,8 @@ window:
 
 <include:"Resiris.module">
 
-v print ResirisModuleObject = Resiris.print()
-v input ResirisModuleObject = Resiris.base_button
+v print ModuleObject = Resiris.print()
+v input ModuleObject = Resiris.base_button
 
 v number1 UnknownObject
 v number2 UnknownObject

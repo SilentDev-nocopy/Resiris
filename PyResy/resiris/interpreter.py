@@ -880,9 +880,9 @@ class Interpreter:
                 )
             return value
 
-        if type_name == "ResirisModuleObject":
+        if type_name == "ModuleObject":
             raise ResirisTypeError(
-                f"{name}: ResirisModuleObject handling has not been implemented yet"
+                f"{name}: ModuleObject handling has not been implemented yet"
             )
 
         raise RuntimeErrorResiris(

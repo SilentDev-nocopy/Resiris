@@ -43,7 +43,7 @@ class Parser:
         TokenType.TYPE_FLOAT: "float",
         TokenType.TYPE_STRING: "string",
         TokenType.TYPE_BOOL: "bool",
-        TokenType.TYPE_RESIRIS_MODULE_OBJECT: "ResirisModuleObject",
+        TokenType.TYPE_MODULE_OBJECT: "ModuleObject",
         TokenType.TYPE_FUNCTIONAL_OBJECT: "FunctionalObject",
     }
 
