@@ -1,22 +1,17 @@
 {
   "name": "resiris-language-support",
   "displayName": "Resiris Language Support",
-  "description": "Language support for the Resiris programming language: syntax highlighting, IntelliSense, missing-include diagnostics with quick fixes, and Seti file icons.",
+  "description": "Language support for the Resiris programming language: syntax highlighting, color themes, editor configuration and Seti file icons.",
   "version": "0.5.0",
   "publisher": "resiris",
   "license": "MIT",
   "icon": "icons/resy.png",
-  "main": "./extension.js",
-  "activationEvents": [
-    "onLanguage:resiris"
-  ],
   "engines": {
     "vscode": "^1.80.0"
   },
   "categories": [
     "Programming Languages",
-    "Themes",
-    "Snippets"
+    "Themes"
   ],
   "contributes": {
     "languages": [
@@ -32,12 +27,6 @@
         "language": "resiris",
         "scopeName": "source.resiris",
         "path": "./syntaxes/resiris.tmLanguage.json"
-      }
-    ],
-    "snippets": [
-      {
-        "language": "resiris",
-        "path": "./snippets/resiris.json"
       }
     ],
     "iconThemes": [

@@ -12,10 +12,6 @@ STAGING = OUT / "extension"
 VERSION = "0.5.0"
 EXTENSION_ID = "resiris-language-support"
 
-MODULES_DIR = ROOT.parents[1] / "Modules"
-sys.path.insert(0, str(ROOT))
-from module_metadata import generate_modules_metadata
-
 cands = [
     Path("/usr/share/code/resources/app/extensions/theme-seti/icons"),
     Path("/usr/lib/code/resources/app/extensions/theme-seti/icons"),
@@ -53,24 +49,13 @@ if STAGING.exists():
     shutil.rmtree(STAGING)
 (STAGING / "icons").mkdir(parents=True)
 (STAGING / "syntaxes").mkdir(parents=True)
-(STAGING / "snippets").mkdir(parents=True)
 (STAGING / "themes").mkdir(parents=True)
 OUT.mkdir(exist_ok=True)
 
-modules_metadata = generate_modules_metadata(MODULES_DIR)
-(STAGING / "modules.json").write_text(
-    json.dumps(modules_metadata, indent=2) + "\n", encoding="utf-8"
-)
-if MODULES_DIR.is_dir():
-    (ROOT / "modules.json").write_text(
-        json.dumps(modules_metadata, indent=2) + "\n", encoding="utf-8"
-    )
-
-for filename in ("package.json", "language-configuration.json", "extension.js"):
+for filename in ("package.json", "language-configuration.json"):
     shutil.copy2(ROOT / filename, STAGING / filename)
 shutil.copy2(ROOT / "icons/resy.png", STAGING / "icons/resy.png")
 shutil.copy2(ROOT / "syntaxes/resiris.tmLanguage.json", STAGING / "syntaxes/resiris.tmLanguage.json")
-shutil.copy2(ROOT / "snippets/resiris.json", STAGING / "snippets/resiris.json")
 for theme_file in sorted((ROOT / "themes").glob("*.json")):
     shutil.copy2(theme_file, STAGING / "themes" / theme_file.name)
 
@@ -96,7 +81,7 @@ manifest = "\n".join([
     f'    <Identity Id="{EXTENSION_ID}" Version="{VERSION}" Language="en" Publisher="resiris" />',
     '    <DisplayName>Resiris Language Support</DisplayName>',
     '    <Description xml:space="preserve">Language support and Seti file icons for the Resiris programming language.</Description>',
-    '    <Categories>Programming Languages;Themes;Snippets</Categories>',
+    '    <Categories>Programming Languages;Themes</Categories>',
     '  </Metadata>',
     '  <Installation><InstallationTarget Id="Microsoft.VisualStudio.Code" Version="[1.80.0,2.0.0)" /></Installation>',
     '  <Dependencies />',
