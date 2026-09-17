@@ -113,6 +113,12 @@ class ModuleAccessExpr:
 
 
 @dataclass
+class ObjectAccessExpr:
+    target: object
+    member_name: str
+
+
+@dataclass
 class ModuleConstantAccessExpr:
     module_name: str
     constant_name: str

@@ -15,6 +15,17 @@ class ModuleInfo:
     variables: str
 
 
+@dataclass
+class ModuleObject:
+    """A module-owned object value returned by a module function."""
+
+    module_name: str
+    handle: object
+
+    def __repr__(self):
+        return f"ModuleObject({self.module_name})"
+
+
 class ModuleLoader:
     """Minimal Python-side Resiris module loader prototype."""
 
@@ -96,6 +107,35 @@ class ModuleLoader:
                 f'{module_name}.{function_name}: unknown module function'
             )
 
+        function = getattr(module, function_name)
+        return self._call(module, module_name, function_name, function, arguments)
+
+    def call_object_method(
+        self,
+        module_name: str,
+        handle: object,
+        method_name: str,
+        arguments: list[object],
+    ):
+        module = self.get(module_name)
+
+        if not self.has_function(module_name, method_name):
+            raise RuntimeErrorResirisModule(
+                f'{module_name}.{method_name}: unknown module function'
+            )
+
+        method = getattr(module, method_name)
+        return self._call(
+            module,
+            module_name,
+            method_name,
+            method,
+            arguments,
+            handle=handle,
+        )
+
+    @staticmethod
+    def _validate_arguments(module_name: str, function_name: str, arguments: list[object]):
         for argument in arguments:
             if isinstance(argument, bool):
                 continue
@@ -104,9 +144,22 @@ class ModuleLoader:
                     f'{argument!r} is not a usable modules argument! Error code:"UnknownModuleArgument"'
                 )
 
-        function = getattr(module, function_name)
+    def _call(
+        self,
+        module,
+        module_name: str,
+        function_name: str,
+        function,
+        arguments: list[object],
+        handle: object = None,
+    ):
+        self._validate_arguments(module_name, function_name, arguments)
+
+        all_arguments = [handle] if handle is not None else []
+        all_arguments.extend(arguments)
+
         try:
-            result = function(*arguments)
+            result = function(*all_arguments)
         except TypeError as error:
             raise RuntimeErrorResirisModule(
                 f'{module_name}.{function_name}: invalid argument count or module function arguments'
@@ -115,9 +168,12 @@ class ModuleLoader:
         if isinstance(result, (bool, int, float, str)):
             return result
 
-        raise RuntimeErrorResirisModule(
-            f'{module_name}.{function_name}: module returned an unsupported value'
-        )
+        if result is None:
+            raise RuntimeErrorResirisModule(
+                f'{module_name}.{function_name}: module returned an unsupported value'
+            )
+
+        return ModuleObject(module_name, result)
 
     def get_constant(self, module_name: str, constant_name: str):
         module = self.get(module_name)

@@ -12,6 +12,7 @@
     { "include": "#types" },
     { "include": "#function-definition" },
     { "include": "#module-access" },
+    { "include": "#object-access" },
     { "include": "#operators" }
   ],
   "repository": {
@@ -108,6 +109,18 @@
         {
           "name": "punctuation.accessor.resiris",
           "match": "[.\\[\\]]"
+        }
+      ]
+    },
+    "object-access": {
+      "patterns": [
+        {
+          "name": "variable.other.object.resiris",
+          "match": "\\b[a-z_][A-Za-z0-9_]*(?=\\s*\\.)"
+        },
+        {
+          "name": "support.function.method.resiris",
+          "match": "(?<=\\.)\\s*[a-z_][A-Za-z0-9_]*"
         }
       ]
     },

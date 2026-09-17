@@ -23,11 +23,12 @@ from .ast_nodes import (
     Include,
     MatStmt,
     ModuleAccessExpr,
+    ObjectAccessExpr,
     ModuleConstantAccessExpr,
     LifecycleDef,
 )
 from .tokenizer import ResirisSyntaxError
-from .module_loader import ModuleLoader, RuntimeErrorResirisModule
+from .module_loader import ModuleLoader, ModuleObject, RuntimeErrorResirisModule
 
 
 class RuntimeErrorResiris(Exception):
@@ -117,6 +118,7 @@ class Interpreter:
         self.scope_stack: list[dict[str, Variable]] = []
         self.module_loader = ModuleLoader(modules_dir)
         self.modules: dict[str, object] = self.module_loader.loaded
+        self._frame_time = 0.0
 
     def run(self, program: Program) -> dict[str, Variable]:
         # Register normal functions and lifecycle definitions before executing
@@ -215,6 +217,7 @@ class Interpreter:
             raise ResirisTypeError("FPS must be greater than 0.0")
 
         for _ in range(frame_count):
+            self._frame_time += 1.0 / fps
             self._execute_lifecycle(lifecycle, fps)
 
     def run_process_forever(self) -> None:
@@ -230,6 +233,7 @@ class Interpreter:
         next_frame = time.monotonic()
 
         while True:
+            self._frame_time += frame_period
             self._execute_lifecycle(lifecycle, fps)
             next_frame += frame_period
             sleep_time = next_frame - time.monotonic()
@@ -555,6 +559,12 @@ class Interpreter:
             variable = self.find_variable(expression.name)
 
             if variable is None:
+                if expression.name in self.functions:
+                    return expression.name
+
+                if expression.name in self.modules:
+                    return expression.name
+
                 raise UnknownVariableError(
                     f"{expression.name}: unknown name"
                 )
@@ -606,8 +616,28 @@ class Interpreter:
             ]
 
             if isinstance(expression.function, ModuleAccessExpr):
+                module_name = expression.function.module_name
+                variable = self.find_variable(module_name)
+                if variable is not None and isinstance(variable.value, ModuleObject):
+                    return self.call_module_object_method(
+                        variable.value,
+                        expression.function.member_name,
+                        arguments,
+                    )
                 return self.module_loader.call_function(
-                    expression.function.module_name,
+                    module_name,
+                    expression.function.member_name,
+                    arguments,
+                )
+
+            if isinstance(expression.function, ObjectAccessExpr):
+                target = self.evaluate(expression.function.target)
+                if not isinstance(target, ModuleObject):
+                    raise ResirisTypeError(
+                        f"object method calls require a ModuleObject value"
+                    )
+                return self.call_module_object_method(
+                    target,
                     expression.function.member_name,
                     arguments,
                 )
@@ -633,8 +663,42 @@ class Interpreter:
             )
 
         if isinstance(expression, ModuleAccessExpr):
+            variable = self.find_variable(expression.module_name)
+            if variable is not None and isinstance(variable.value, ModuleObject):
+                return self.call_module_object_method(
+                    variable.value,
+                    expression.member_name,
+                    [],
+                )
+
+            if expression.module_name in self.modules:
+                try:
+                    if self.module_loader.has_function(
+                        expression.module_name,
+                        expression.member_name,
+                    ):
+                        return self.module_loader.call_function(
+                            expression.module_name,
+                            expression.member_name,
+                            [],
+                        )
+                except RuntimeErrorResirisModule:
+                    pass
+
             raise RuntimeErrorResiris(
                 "module `.` access is only valid for function calls"
+            )
+
+        if isinstance(expression, ObjectAccessExpr):
+            target = self.evaluate(expression.target)
+            if not isinstance(target, ModuleObject):
+                raise ResirisTypeError(
+                    f"object member access requires a ModuleObject value"
+                )
+            return self.call_module_object_method(
+                target,
+                expression.member_name,
+                [],
             )
 
         if isinstance(expression, ModuleConstantAccessExpr):
@@ -645,6 +709,7 @@ class Interpreter:
                 )
             except RuntimeErrorResirisModule as error:
                 raise RuntimeErrorResiris(str(error)) from error
+
 
         raise RuntimeErrorResiris(
             f"The current interpreter version does not recognize this expression: "
@@ -680,6 +745,31 @@ class Interpreter:
             return None
         finally:
             self.scope_stack.pop()
+
+    def call_module_object_method(
+        self,
+        module_object: ModuleObject,
+        method_name: str,
+        arguments: list[object],
+    ):
+        handle = module_object.handle
+
+        if isinstance(handle, dict):
+            handle["_now"] = self._frame_time
+
+        result = self.module_loader.call_object_method(
+            module_object.module_name,
+            handle,
+            method_name,
+            arguments,
+        )
+
+        if isinstance(handle, dict):
+            pending_callback = handle.pop("_fire_callback", None)
+            if pending_callback is not None:
+                self.call_function(pending_callback, [])
+
+        return result
 
     def apply_binary(self, left, operator, right, target_name):
         left_is_number = (
@@ -828,6 +918,9 @@ class Interpreter:
         if isinstance(value, str):
             return "string"
 
+        if isinstance(value, ModuleObject):
+            return "ModuleObject"
+
         raise ResirisTypeError(
             f"UnknownObject: type cannot be determined: "
             f"{type(value).__name__}"
@@ -881,9 +974,12 @@ class Interpreter:
             return value
 
         if type_name == "ModuleObject":
-            raise ResirisTypeError(
-                f"{name}: ModuleObject handling has not been implemented yet"
-            )
+            if not isinstance(value, ModuleObject):
+                raise ResirisTypeError(
+                    f"{name}: a ModuleObject value is required, "
+                    f"received: {type(value).__name__}"
+                )
+            return value
 
         raise RuntimeErrorResiris(
             f"{name}: unknown type: {type_name}"

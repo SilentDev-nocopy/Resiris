@@ -2,7 +2,7 @@
   "name": "resiris-language-support",
   "displayName": "Resiris Language Support",
   "description": "Language support and Seti file icons for the Resiris programming language.",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "publisher": "resiris",
   "license": "MIT",
   "icon": "icons/resy.png",

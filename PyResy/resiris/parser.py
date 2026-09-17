@@ -25,6 +25,7 @@ from .ast_nodes import (
     MatStmt,
     MatCase,
     ModuleAccessExpr,
+    ObjectAccessExpr,
     ModuleConstantAccessExpr,
     LifecycleDef,
 )
@@ -561,12 +562,10 @@ class Parser:
                     )
 
                 if method.value not in {"type", "string"}:
-                    if not isinstance(expr, Name):
-                        self.error(
-                            method,
-                            "module access requires a module name before `.`"
-                        )
-                    expr = ModuleAccessExpr(expr.name, method.value)
+                    if isinstance(expr, Name):
+                        expr = ModuleAccessExpr(expr.name, method.value)
+                    else:
+                        expr = ObjectAccessExpr(expr, method.value)
                     continue
 
                 self.expect(

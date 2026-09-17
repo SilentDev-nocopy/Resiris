@@ -27,5 +27,33 @@
       "<include> ${1:ModuleName}$0"
     ],
     "description": "Resiris module include"
+  },
+  "Resiris RSBase timer": {
+    "prefix": "timer",
+    "body": [
+      "v ${1:timer} ModuleObject = RSBase.await",
+      "${1:timer}.set_timer(${2:1.0}).on_timeout(${3:on_done})$0"
+    ],
+    "description": "RSBase timer ModuleObject declaration and scheduling"
+  },
+  "Resiris RSBase module": {
+    "prefix": "rsbase",
+    "body": [
+      "<include> RSBase",
+      "",
+      "fn ${1:on_done}():",
+      "\tprint_cmd(\"timer done\")",
+      "",
+      "v ${2:timer} ModuleObject = RSBase.await",
+      "",
+      "START():",
+      "\t${2:timer}.set_timer(${3:1.0}).on_timeout(${1:on_done})",
+      "",
+      "c FPS float = ${4:60.0}",
+      "PROCESS(FPS):",
+      "\tprint_cmd(${2:timer}.process)",
+      "$0"
+    ],
+    "description": "RSBase module timer skeleton"
   }
 }
