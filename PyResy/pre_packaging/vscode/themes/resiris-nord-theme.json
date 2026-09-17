@@ -969,6 +969,20 @@
       }
     },
     {
+      "name": "Resiris: variable.other.object.resiris",
+      "scope": "variable.other.object.resiris",
+      "settings": {
+        "foreground": "#F8BD96"
+      }
+    },
+    {
+      "name": "Resiris: support.function.method.resiris",
+      "scope": "support.function.method.resiris",
+      "settings": {
+        "foreground": "#8BD5CA"
+      }
+    },
+    {
       "name": "Resiris: punctuation.accessor.resiris",
       "scope": "punctuation.accessor.resiris",
       "settings": {
