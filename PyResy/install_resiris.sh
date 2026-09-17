@@ -268,7 +268,6 @@ if [[ -x "$BIN_DIR/resiris" ]] && "$BIN_DIR/resiris" --version >/dev/null 2>&1; 
     echo "Run:"
     echo "  resiris <file.resy>"
     echo
-    echo "New terminals pick up the resiris command and completions automatically."
 else
     echo "WARNING: The resiris command could not be verified." >&2
     exit 1
