@@ -1,2 +1,6 @@
-<include> RSBase
-v asd ModuleObject = RSBase
+
+
+c FPS float = 60
+
+PROCESS(FPS):
+	print_cmd(FPS)
