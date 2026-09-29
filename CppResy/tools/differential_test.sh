@@ -26,10 +26,22 @@ else
     fixtures=("$fixture_dir"/*.resy)
 fi
 
+# The Python side runs from inside the prototype directory, so every fixture
+# path has to be resolved to an absolute path before that cd happens.
+absolute_fixtures=()
+for fixture in "${fixtures[@]}"; do
+    if [ -f "$fixture" ]; then
+        absolute_fixtures+=("$(cd "$(dirname "$fixture")" && pwd)/$(basename "$fixture")")
+    else
+        echo "no such file: $fixture" >&2
+        exit 2
+    fi
+done
+
 passed=0
 failed=0
 
-for fixture in "${fixtures[@]}"; do
+for fixture in "${absolute_fixtures[@]}"; do
     name="$(basename "$fixture" .resy)"
 
     (cd "$prototype_dir" && python3 -m resiris.cli "$fixture") > "$work_dir/$name.py" 2>&1

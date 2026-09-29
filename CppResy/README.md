@@ -1,41 +1,9 @@
 # Resiris C++ port
 
-C++17 port of the Resiris language: tokenizer, parser, interpreter, module
-system, the `RSMath` and `RSBase` modules, and the CLI. The Python prototype in
-`../PyResy` is the behavioural specification - error messages, float formatting
-and every diagnostic are meant to match it byte for byte.
+C++17 port of the Python prototype in `../PyResy`. Behaviour is identical: error
+messages, float formatting and the token/AST dump match byte for byte.
 
-## Install the `resiris` command
-
-The Python package exposes a `resiris` console script
-(`[project.scripts] resiris = "resiris.cli:main"`). This port installs under the
-same name, so the workflow is identical:
-
-```sh
-cmake --install build --prefix ~/.local
-resiris examples/01_basics.resy
-```
-
-The C++ port resolves `RSMath` and `RSBase` internally, so unlike the Python
-one it runs from any directory with no `PYTHONPATH`, virtualenv or `cd` setup.
-
-Note: if you later `pip install` the Python package it will overwrite this
-command in the same `bin` directory. Keep them in separate prefixes, or invoke
-the build output directly as `./build/resiris`.
-
-## Try it
-
-Ready made programs live in `examples/`:
-
-```sh
-./build/resiris examples/01_basics.resy            # math, types, conversions
-./build/resiris examples/02_control_flow.resy      # if/elif/else, mat, recursion
-./build/resiris examples/03_functions.resy         # functions, FunctionalObject
-./build/resiris examples/04_timer_lifecycle.resy   # RSBase timer + PROCESS, Ctrl+C to stop
-```
-
-`04_timer_lifecycle.resy` runs the PROCESS lifecycle at 10 FPS until you press
-Ctrl+C, which stops it the same way the Python CLI does.
+All commands below run from this directory (`CppResy/`).
 
 ## Build
 
@@ -44,61 +12,89 @@ cmake -S . -B build
 cmake --build build -j
 ```
 
-Targets:
+After a source change, just `cmake --build build -j`.
 
-- `resiris` - the library (tokenizer, parser, interpreter, modules)
-- `resiris` (from `resiris-cli`) - the command line runner
-- `resiris-tests` - the Catch2 test suite
+## Install
+
+```sh
+cmake --install build --prefix ~/.local
+```
+
+This puts the `resiris` command in `~/.local/bin/resiris`, which works from any
+directory:
+
+```sh
+resiris examples/01_basics.resy
+```
+
+If you later `pip install` the Python package, it installs a `resiris` command
+too and overwrites this one. Keep them in separate prefixes, or use the build
+output directly as `./build/resiris`.
+
+## Uninstall
+
+```sh
+tools/uninstall.sh            # remove the installed command
+tools/uninstall.sh --purge    # also delete build/ and ~/.config/resiris
+```
+
+Removes exactly the files `cmake --install` wrote, nothing else. Safe to run
+twice. After `--purge` you have to build again from scratch.
+
+## Run
+
+```sh
+./build/resiris examples/01_basics.resy            # math, types, conversions
+./build/resiris examples/02_control_flow.resy      # if/elif/else, mat, recursion
+./build/resiris examples/03_functions.resy         # functions, FunctionalObject
+./build/resiris examples/04_timer_lifecycle.resy   # RSBase timer, Ctrl+C to stop
+```
+
+Also: `--version`, `--help`, `--enable-frontend-visibility` (adds `<TOKENS>` and
+`<AST>` output).
 
 ## Test
 
 ```sh
-./build/resiris-tests          # or: ctest --test-dir build
+./build/resiris-tests                  # 114 Catch2 cases
+./tools/differential_test.sh           # 29 programs, compared with the prototype
+python3 tools/audit_sweep.py           # 589 programs taken from the Python tests
 ```
 
-## Differential test against the prototype
-
-`tools/differential_test.sh` runs every `tests/differential/*.resy` fixture
-through both the Python prototype and this port, then compares stdout, stderr
-and the exit code. A C++/Python mismatch in any user visible behaviour fails
-the run.
+Both scripts run the Python prototype themselves, so they work from this
+directory without any setup. Pass a file to check just one program:
 
 ```sh
-cmake --build build -j
-./tools/differential_test.sh
+./tools/differential_test.sh my_program.resy
 ```
 
-## Run a program
+## Compare a program with the prototype
+
+The Python side has to run from `../PyResy`, the C++ side from anywhere:
 
 ```sh
-./build/resiris path/to/program.resy
-./build/resiris --enable-frontend-visibility program.resy   # + <TOKENS>/<AST>
+cd ../PyResy && python3 -m resiris.cli ~/prog.resy > /tmp/py.txt 2>&1
+cd ../CppResy && ./build/resiris ~/prog.resy > /tmp/cpp.txt 2>&1
+diff /tmp/py.txt /tmp/cpp.txt && echo identical
 ```
-
-Both CLIs read the same frontend visibility setting from
-`~/.config/resiris/frontend_visibility`, so the dumped token stream and AST are
-compared as well when it is enabled.
 
 ## Layout
 
 | Path | Contents |
 | --- | --- |
-| `include/resiris/value.hpp` | runtime `Value`, `ModuleObject`, `FunctionalObject`, `FrameAwareState` |
-| `include/resiris/errors.hpp` | error hierarchy mirroring the prototype exceptions |
-| `include/resiris/token.hpp`, `src/tokenizer.cpp` | token types and the scanner |
-| `include/resiris/ast.hpp`, `src/parser.cpp` | AST nodes and the recursive descent parser |
-| `include/resiris/interpreter.hpp`, `src/interpreter.cpp` | scopes, statements, expressions, lifecycles |
-| `include/resiris/module.hpp` | `Module` interface and `ModuleRegistry` (`<include>` handling) |
-| `include/resiris/rsmath.hpp`, `src/rsmath.cpp` | the `RSMath` module |
-| `include/resiris/rsbase.hpp`, `src/rsbase.cpp` | the `RSBase` timer module |
-| `src/cli.cpp` | CLI, banner, frontend visibility, AST dump |
-| `tests/` | Catch2 suite (`test_*.cpp`) and the differential fixtures |
-| `third_party/catch.hpp` | Catch2 2.13.10 single header |
+| `include/resiris/`, `src/` | tokenizer, parser, interpreter, modules, CLI |
+| `include/resiris/rsmath.hpp`, `include/resiris/rsbase.hpp` | the two built-in modules |
+| `examples/` | runnable example programs |
+| `tests/` | Catch2 suite and the differential fixtures |
+| `tools/` | `differential_test.sh`, `audit_sweep.py`, `uninstall.sh` |
+| `third_party/catch.hpp` | Catch2 2.13.10 |
 
-## Behaviour notes
+## Notes
 
-Differences from the prototype that are deliberate:
-
-- `int` is `int64_t` instead of Python's arbitrary precision integer.
-- A module domain error (`RSMath.ln(0)`) surfaces as a `ModuleError` with the
-  prototype's message; Python lets the raw `ValueError` escape.
+- `int` is `int64_t`, not Python's arbitrary precision integer.
+- Modules are compiled in, not loaded from files at runtime, so
+  `<include> SomeUserModule` only works in the Python prototype. This is the
+  intended direction for the embedded target.
+- Adding a module: implement the five methods of `Module`
+  (`include/resiris/module.hpp`), add the source to `CMakeLists.txt`, and add
+  one line to the registration list in `src/cli.cpp`.
