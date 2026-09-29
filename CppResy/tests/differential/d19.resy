@@ -1,0 +1,2 @@
+v d FunctionalObject = FunctionalObject.new(a, a):
+	return a

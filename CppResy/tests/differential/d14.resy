@@ -1,0 +1,16 @@
+v s string = "line1\nline2\ttab \"quoted\" back\\slash"
+print_cmd(s)
+print_cmd("a" == "a")
+v n int = 5
+print_cmd(n.type())
+print_cmd(n.string())
+print_cmd(n.type(int))
+v f float = 2.5
+print_cmd(f.type(int))
+print_cmd(f.type(string))
+v b bool = false
+print_cmd(b.type(int))
+print_cmd(b.type(float))
+print_cmd(b.type(string))
+print_cmd(b.string())
+print_cmd(b.type())

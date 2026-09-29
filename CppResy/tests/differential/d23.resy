@@ -1,0 +1,8 @@
+v a int = 1
+mat a:
+	1:
+		pass
+	else:
+		pass
+	2:
+		pass

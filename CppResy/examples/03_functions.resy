@@ -1,0 +1,28 @@
+## Functions and objects. Parameters are untyped names - the caller decides.
+
+## Recursive factorial: the only repetition construct the language has.
+fn factorial(n):
+	if n <= 1:
+		return 1
+	return n * factorial(n - 1)
+
+print_cmd(factorial(10))
+
+fn double(value):
+	return value * 2
+
+print_cmd(double(21))
+
+## A FunctionalObject is a value: it can be stored in a variable and called
+## later. Note that the `FunctionalObject.new(...)` form is only valid as the
+## value of a top level declaration, not inside a function body.
+v times3 FunctionalObject = FunctionalObject.new(value):
+	return value * 3
+
+print_cmd(times3(14))
+
+## Objects can also be attached to a module handle.
+<include> RSBase
+
+v timer ModuleObject = RSBase.await()
+print_cmd(timer)

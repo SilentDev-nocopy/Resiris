@@ -1,0 +1,4 @@
+v x UnknownObject = 1
+print_cmd(x)
+x = 2
+print_cmd(x)

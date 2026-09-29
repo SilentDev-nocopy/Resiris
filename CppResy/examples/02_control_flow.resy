@@ -1,0 +1,52 @@
+## Control flow: if / elif / else and the mat statement.
+## The language has no while loop - recursion is the only repetition.
+
+v x int = 2
+
+if x == 1:
+	print_cmd("one")
+elif x == 2:
+	print_cmd("two")
+elif x == 3:
+	print_cmd("three")
+else:
+	print_cmd("many")
+
+## mat dispatches on a value ...
+v value int = 5
+
+mat value:
+	1:
+		print_cmd("small")
+	2:
+		print_cmd("medium")
+	else:
+		print_cmd("large")
+
+## ... and on a type, via a type query.
+mat value.type():
+	int:
+		print_cmd("is int")
+	float:
+		print_cmd("is float")
+	else:
+		print_cmd("is something else")
+
+## A mat mixes at most one case type per branch group, so numbers and strings
+## live in separate mats.
+v text string = "input"
+
+mat text:
+	"input":
+		print_cmd("matched a string")
+	else:
+		print_cmd("something else")
+
+## Loops are written as recursion.
+fn countdown(from):
+	if from <= 0:
+		return
+	print_cmd(from)
+	countdown(from - 1)
+
+countdown(3)

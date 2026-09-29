@@ -1,0 +1,3 @@
+fn boom():
+	return 1 + "x"
+v r int = boom()

@@ -1,0 +1,31 @@
+<include> RSMath, RSBase
+c FPS float = 60.0
+v a int = 1 + 2 * 3
+v b string = "text"
+v d FunctionalObject = FunctionalObject.new(number):
+	return number * 2
+fn work(p, q):
+	if p > q:
+		return p
+	elif p == q:
+		return 0
+	else:
+		return q
+fn classify(value):
+	mat value.type():
+		int:
+			return "int"
+		float:
+			return "float"
+		else:
+			return "other"
+START():
+	print_cmd("start")
+mat a:
+	1:
+		pass
+	else:
+		pass
+print_cmd(RSMath.sqrt(4))
+print_cmd(RSMath[PI])
+print_cmd(d(2))

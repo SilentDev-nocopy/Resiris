@@ -1,0 +1,6 @@
+v x int = 1
+mat x:
+	1:
+		print_cmd("one")
+	1:
+		print_cmd("dup")

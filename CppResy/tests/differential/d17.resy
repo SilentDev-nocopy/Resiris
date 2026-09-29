@@ -1,0 +1,5 @@
+fn outer(a):
+	fn inner(b):
+		return b * 2
+	return inner(a) + 1
+print_cmd(outer(3))

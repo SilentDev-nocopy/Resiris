@@ -1,0 +1,6 @@
+v a int = 1
+mat a:
+	1:
+		pass
+	"text":
+		pass

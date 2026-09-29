@@ -1,0 +1,24 @@
+## Timers and the PROCESS lifecycle.
+##
+## Run it and press Ctrl+C - both the Python CLI and this port print
+## "Resiris program stopped." and exit with 0.
+##
+##   ./build/resiris-cli examples/04_timer_lifecycle.resy
+##
+## PROCESS runs at 10 frames per second. `t.process()` returns how much time
+## has passed since the previous call, so the same program prints larger and
+## larger numbers.
+
+<include> RSBase
+
+c FPS float = 10.0
+
+v t ModuleObject = RSBase.await()
+v elapsed float = 0.0
+v frames int = 0
+
+PROCESS(FPS):
+	elapsed = t.process()
+	frames = frames + 1
+	print_cmd(frames)
+	print_cmd(elapsed)

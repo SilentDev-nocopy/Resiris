@@ -1,0 +1,16 @@
+print_cmd(-7 % 3)
+print_cmd(7 % -3)
+print_cmd(-7 % -3)
+print_cmd(7 % 3)
+print_cmd(-7.5 % 2.0)
+print_cmd(7.5 % -2.0)
+v a int = -7
+print_cmd(a % 3)
+v b float = -7.5
+print_cmd(b % 2.0)
+print_cmd(-0.0)
+print_cmd(0.1 + 0.2)
+print_cmd(0.1)
+print_cmd(1.0 / 3.0)
+print_cmd(2.0 * 3.5)
+print_cmd(123456789012345678)

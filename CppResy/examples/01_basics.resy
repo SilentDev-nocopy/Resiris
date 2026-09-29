@@ -1,0 +1,38 @@
+## Basics: constants, typed variables, RSMath, conversions and printing.
+
+<include> RSMath
+
+c GREETING string = "Resiris C++ port"
+
+v radius float = 2.5
+v area float = 0.0
+v name string = "world"
+v alive bool = true
+
+area = RSMath[PI] * radius * radius
+
+print_cmd(GREETING)
+print_cmd(RSMath.sqrt(area))
+print_cmd(RSMath.round(area))
+print_cmd(RSMath.floor(area))
+print_cmd(RSMath.ceil(area))
+print_cmd(RSMath.max(1, 2))
+print_cmd(RSMath.min(3.5, 1.5))
+print_cmd(RSMath.abs(-7.5))
+print_cmd(RSMath[PI] * 2)
+
+## Integer arithmetic stays integer, and the sign follows the floor rule.
+## Note: `/` needs a float on the left too - `a / 2` and `a / 2.0` both raise
+## `IntDivisionError` when `a` is an int. Use `.type(float)` first.
+v a int = -7
+print_cmd(a % 3)
+print_cmd(a.type(float) / 2.0)
+
+## Declarations are typed: a conversion needs an explicit target type.
+v whole int = area.type(int)
+v text string = whole.type(string)
+print_cmd(whole)
+print_cmd(text)
+print_cmd(whole.string())
+print_cmd(area.type())
+print_cmd(alive)

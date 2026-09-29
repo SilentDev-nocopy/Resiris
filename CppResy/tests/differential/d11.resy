@@ -1,0 +1,2 @@
+v s string = "x"
+v n int = s.type(int)

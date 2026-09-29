@@ -1,0 +1,27 @@
+<include> RSMath
+v a int = 10
+v b float = 3.5
+v s string = "hello"
+v t bool = true
+print_cmd(a)
+print_cmd(b)
+print_cmd(s)
+print_cmd(t)
+print_cmd(1.0 / 3.0)
+print_cmd(2 * 3 + 4)
+print_cmd(-7 % 3)
+print_cmd(7.5 % 2.0)
+print_cmd(1 == 1.0)
+print_cmd("a" != "b")
+print_cmd(2 > 1.5)
+print_cmd(RSMath.sqrt(2))
+print_cmd(RSMath.pow(2, 0.5))
+print_cmd(RSMath[PI])
+print_cmd(RSMath[PI] * 2)
+v conv string = a.type(string)
+print_cmd(conv)
+v d int = b.type(int)
+print_cmd(d)
+v e string = b.type()
+print_cmd(e)
+print_cmd(b.string())

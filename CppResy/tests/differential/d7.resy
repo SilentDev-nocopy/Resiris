@@ -1,0 +1,3 @@
+v a int = 1
+v a string = "hello"
+print_cmd(a)

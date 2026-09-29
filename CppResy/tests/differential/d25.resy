@@ -1,0 +1,4 @@
+v a int = 1
+print_cmd(a)
+if a == 1:
+	pass
