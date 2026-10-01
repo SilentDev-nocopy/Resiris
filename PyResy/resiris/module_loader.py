@@ -6,6 +6,11 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
+def default_modules_dir() -> Path:
+    """Return the Modules directory shipped next to the resiris package."""
+    return Path(__file__).resolve().parent.parent / "Modules"
+
+
 @dataclass(frozen=True)
 class ModuleInfo:
     """Python-side prototype metadata for a loaded Resiris module."""
@@ -29,8 +34,10 @@ class ModuleObject:
 class ModuleLoader:
     """Minimal Python-side Resiris module loader prototype."""
 
-    def __init__(self, modules_dir: Path | str = "Modules"):
-        self.modules_dir = Path(modules_dir)
+    def __init__(self, modules_dir: Path | str | None = None):
+        self.modules_dir = (
+            default_modules_dir() if modules_dir is None else Path(modules_dir)
+        )
         self.loaded: dict[str, object] = {}
         self.info: dict[str, ModuleInfo] = {}
 

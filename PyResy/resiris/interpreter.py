@@ -28,7 +28,12 @@ from .ast_nodes import (
     LifecycleDef,
 )
 from .tokenizer import ResirisSyntaxError
-from .module_loader import ModuleLoader, ModuleObject, RuntimeErrorResirisModule
+from .module_loader import (
+    ModuleLoader,
+    ModuleObject,
+    RuntimeErrorResirisModule,
+    default_modules_dir,
+)
 
 
 class RuntimeErrorResiris(Exception):
@@ -110,13 +115,15 @@ class Interpreter:
     - this scope rule is currently a PROTOTYPE, not the final Resiris specification
     """
 
-    def __init__(self, modules_dir: Path | str = "Modules"):
+    def __init__(self, modules_dir: Path | str | None = None):
         self.variables: dict[str, Variable] = {}
         self.functions: dict[str, FunctionDef] = {}
         self.start_lifecycle: LifecycleDef | None = None
         self.process_lifecycle: LifecycleDef | None = None
         self.scope_stack: list[dict[str, Variable]] = []
-        self.module_loader = ModuleLoader(modules_dir)
+        self.module_loader = ModuleLoader(
+            default_modules_dir() if modules_dir is None else modules_dir
+        )
         self.modules: dict[str, object] = self.module_loader.loaded
         self._frame_time = 0.0
 

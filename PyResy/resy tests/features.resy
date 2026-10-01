@@ -1,0 +1,149 @@
+<include> RSMath, RSBase
+
+c FPS float = 10.0
+c LIMIT int = 10
+
+v a int = 10
+v b int = 3
+v x float = 2.5
+v y float = 4.0
+v s string = "Hello"
+v t string = "World"
+v flag bool = true
+v u UnknownObject = 42
+v index int = 0
+
+print_cmd(a)
+print_cmd(b)
+print_cmd(a + b)
+print_cmd(a - b)
+print_cmd(a * b)
+print_cmd(a % b)
+print_cmd(7 % 3)
+print_cmd(-7 % 3)
+print_cmd(7 % -3)
+print_cmd(x + y)
+print_cmd(x * y)
+print_cmd(y / x)
+print_cmd(0.1 + 0.2)
+print_cmd(-x)
+print_cmd(100.0)
+print_cmd(0.00001)
+print_cmd(1000000.0)
+print_cmd(x * 1000000.0)
+print_cmd(s + " " + t)
+print_cmd(a == 10)
+print_cmd(a != b)
+print_cmd(b < a)
+print_cmd(s < t)
+print_cmd(flag)
+print_cmd(flag == (a > b))
+print_cmd(u.type())
+print_cmd(x.type())
+print_cmd(s.type())
+print_cmd(flag.type())
+print_cmd(x.type(int))
+print_cmd(b.type(float))
+print_cmd(b.type(string))
+print_cmd(u.type(bool))
+print_cmd(b.type(bool))
+print_cmd(s.string())
+print_cmd(str(a))
+print_cmd(LIMIT)
+
+v dec float = 26.0
+dec += 5
+print_cmd(dec)
+dec -= 2
+print_cmd(dec)
+dec *= 2
+print_cmd(dec)
+dec /= 2.0
+print_cmd(dec)
+
+fn classify(val):
+	if val.type() == "int":
+		return "int value"
+	elif val.type() == "float":
+		return "float value"
+	elif val.type() == "bool":
+		return "bool value"
+	else:
+		return "string value"
+
+fn describe(n):
+	mat n:
+		1:
+			return "one"
+		2:
+			return "two"
+		3:
+			return "three"
+		else:
+			return "many"
+
+print_cmd(classify(a))
+print_cmd(classify(x))
+print_cmd(classify(flag))
+print_cmd(classify(s))
+print_cmd(describe(1))
+print_cmd(describe(2))
+print_cmd(describe(7))
+
+mat x.type():
+	int:
+		print_cmd("mat says int")
+	float:
+		print_cmd("mat says float")
+	else:
+		print_cmd("mat says other")
+
+v counter FunctionalObject = FunctionalObject.new():
+	index += 1
+	return index
+print_cmd(counter())
+print_cmd(counter())
+print_cmd(counter())
+
+print_cmd(RSMath.abs(-7))
+print_cmd(RSMath.abs(-7.5))
+print_cmd(RSMath.sqrt(16.0))
+print_cmd(RSMath.cbrt(27.0))
+print_cmd(RSMath.pow(2.0, 10.0))
+print_cmd(RSMath.floor(3.7))
+print_cmd(RSMath.ceil(3.2))
+print_cmd(RSMath.round(3.5))
+print_cmd(RSMath.round(2.5))
+print_cmd(RSMath.ln(RSMath[E]))
+print_cmd(RSMath.log10(1000.0))
+print_cmd(RSMath.sin(0.0))
+print_cmd(RSMath.cos(0.0))
+print_cmd(RSMath.tan(0.0))
+print_cmd(RSMath.atan(1.0))
+print_cmd(RSMath.hypot(3.0, 4.0))
+print_cmd(RSMath.pythagoras(3.0, 4.0))
+print_cmd(RSMath.factorial(10))
+print_cmd(RSMath.ncr(5, 2))
+print_cmd(RSMath.npr(5, 2))
+print_cmd(RSMath.gcd(12, 18))
+print_cmd(RSMath.lcm(4, 6))
+print_cmd(RSMath.mod(7, 3))
+print_cmd(RSMath.mod(-7, 3))
+print_cmd(RSMath.min(2, 7))
+print_cmd(RSMath.max(2, 7))
+print_cmd(RSMath.clamp(5.5, 1.0, 3.0))
+print_cmd(RSMath.is_nan(1.0))
+print_cmd(RSMath.is_inf(1.0))
+print_cmd(RSMath.is_finite(1.0))
+print_cmd(RSMath[PI])
+print_cmd(RSMath[E])
+
+v timer ModuleObject = RSBase.await()
+timer.set_timer(0.35)
+timer.on_timeout("timer_callback")
+START():
+	print_cmd("start lifecycle")
+PROCESS(FPS):
+	print_cmd(timer.process())
+fn timer_callback():
+	print_cmd("timer callback fired")
