@@ -3,7 +3,7 @@
 Installs:
 - Linux `*.resy` MIME type
 - Linux file-manager icon `application-x-resy`
-- Seti-based VS Code theme where only `*.resy` uses the RESY icon
+- Seti-based VS Code theme where only `*.resy` files use the RESY icon
 
 Run `./install.sh` to install everything.
 Run `./uninstall.sh` to remove everything.

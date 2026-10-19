@@ -2,7 +2,7 @@
 
 > Resiris is the programming language designed for [Galena](https://github.com/SilentDev-nocopy/Galena.git), a standalone programmable computing environment.
 
- This repository provides the PC-side development environment: a tokenizer, parser, AST and interpreter for .resy source files, along with optional editor and shell integration.
+This repository provides the PC-side development environment: a tokenizer, parser, AST and interpreter for `.resy` source files, along with optional editor and shell integration.
 
 For now, only the Python version aka. "PyResy" is available!
 
@@ -31,7 +31,7 @@ Run a specific Resiris program with:
 python3 -m resiris program.resy
 ```
 
-## **Installing `resiris` as a terminal command***
+## Installing `resiris` as a terminal command
 
 To start Resiris by simply typing `resiris` from any terminal, run the installer from inside the project folder:
 
@@ -59,7 +59,7 @@ The VS Code extension adds:
 
 Installing the terminal tool alone does not install the VS Code extension or its icon theme, and vice versa.
 
-Once installed, `resiris program.resy` and plain `resiris` behave exactly as described above — no automatic `main.resy`.
+Once installed, `resiris program.resy` and plain `resiris` behave exactly as described above — there is no automatic `main.resy` execution.
 
 ---
 

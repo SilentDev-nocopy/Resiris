@@ -58,7 +58,7 @@ Also: `--version`, `--help`, `--enable-frontend-visibility` (adds `<TOKENS>` and
 ```sh
 ./build/resiris-tests                  # 114 Catch2 cases
 ./tools/differential_test.sh           # 29 programs, compared with the prototype
-python3 tools/audit_sweep.py           # 589 programs taken from the Python tests
+python3 tools/audit_sweep.py           # 589 programs taken from the Python test suite
 ```
 
 Both scripts run the Python prototype themselves, so they work from this
@@ -68,7 +68,7 @@ directory without any setup. Pass a file to check just one program:
 ./tools/differential_test.sh my_program.resy
 ```
 
-## Compare a program with the prototype
+## Compare a program with the Python prototype
 
 The Python side has to run from `../PyResy`, the C++ side from anywhere:
 
@@ -91,9 +91,9 @@ diff /tmp/py.txt /tmp/cpp.txt && echo identical
 
 ## Notes
 
-- `int` is `int64_t`, not Python's arbitrary precision integer.
+- `int` is `int64_t`, not Python's arbitrary-precision integer.
 - Modules are compiled in, not loaded from files at runtime, so
-  `<include> SomeUserModule` only works in the Python prototype. This is the
+  the `<include>` directive only works in the Python prototype. This is the
   intended direction for the embedded target.
 - Adding a module: implement the five methods of `Module`
   (`include/resiris/module.hpp`), add the source to `CMakeLists.txt`, and add
