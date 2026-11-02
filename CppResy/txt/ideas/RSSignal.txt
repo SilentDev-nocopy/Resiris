@@ -1,11 +1,11 @@
 Name: RSSignal
 
-The Resiris module which provides the GPUIs usage. Sending and receiving data from them.
+The Resiris module which provides the GPIOs usage. Sending and receiving data from them.
 
 functions:
 
-constants: GPUIS
+constants: NORMAL_GPIOS, BOOT_GPIOS, 
 
-v signal_name : ModuleObject = RSSignal[GPUIS]
+v pin : ModuleObject = RSSignal[GPIOS]
 
-signal_name.connect()
+pin.connect()

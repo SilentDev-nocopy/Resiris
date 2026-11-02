@@ -1,0 +1,192 @@
+########################################################################
+## ESP32-WROOM-32 GPIO kiosztasi tabla
+########################################################################
+
+Cel:
+    A tabla az ESP32-WROOM-32 modul GPIO-labait csoportositja elsoleges
+    javasolt felhasznalas szerint. Minden felsorolt GPIO pontosan egy
+    csoportban szerepel.
+
+Fontos:
+    Ez a tabla a projektben megadott ESP32-WROOM-32 modulra vonatkozik.
+    A fejleszto panel pontos kiosztasa panelenkent elterhet; bekotes elott
+    ellenorizd a panel feliratait es kapcsolasi rajzat.
+
+    A GPIO szamok a chip logikai pinjei. Nem azonosak a panel fizikai
+    csatlakozohelyeinek sorszamaival.
+
+    Az ESP32-WROOM-32 modul 26 altalanos celra kivezetett GPIO-t ad.
+    A GPIO6-GPIO11 a modul flashmemoriajahoz kapcsolodik, a GPIO37 es
+    GPIO38 pedig nem hozzaferheto a modulon. Ezeket ne vedd fel a program
+    szabadon hasznalhato GPIO-listajaba.
+
+
+########################################################################
+## 1. GPIO csoportok - minden lab egyszer szerepel
+########################################################################
+
++------------------------+-------------------------------------------+
+| Csoport                | GPIO-k                                    |
++------------------------+-------------------------------------------+
+| ADC1_WIFI_SAFE_GPIOS   | GPIO32, GPIO33, GPIO34, GPIO35, GPIO36,   |
+|                        | GPIO39                                    |
+| BOOTSTRAP_GPIOS        | GPIO0, GPIO2, GPIO5, GPIO12, GPIO15      |
+| UART0_GPIOS            | GPIO1, GPIO3                              |
+| GENERAL_DIGITAL_GPIOS  | GPIO4, GPIO13, GPIO14, GPIO16, GPIO17,   |
+|                        | GPIO18, GPIO19, GPIO21, GPIO22, GPIO23,   |
+|                        | GPIO25, GPIO26, GPIO27                    |
++------------------------+-------------------------------------------+
+
+Elsoleges csoportositas:
+    - Az ADC1_WIFI_SAFE_GPIOS az analog bemenetek elsodleges csoportja.
+      Az ADC1 Wi-Fi hasznalata mellett is alkalmazhato.
+    - A BOOTSTRAP_GPIOS labak bootolas kozbeni allapota befolyasolhatja az
+      inditast. Csak a panel indulasi kovetelmenyeinek ellenorzese utan
+      terheld oket kulso aramkorrel.
+    - Az UART0_GPIOS alapertelmezett soros kommunikacios labpar.
+      Fejleszteskor altalaban feltoltesre es hibakeresesre hasznaljak.
+    - A GENERAL_DIGITAL_GPIOS csoport tagjai a projektben elsodlegesen
+      digitalis I/O feladatokra foglalhatok le.
+
+
+########################################################################
+## 2. Labankenti kepessegek es korlatozasok
+########################################################################
+
++--------+------------------------+--------------------------------------+
+| GPIO   | Elso csoport           | Kiemelt kepesseg / figyelmeztetes    |
++--------+------------------------+--------------------------------------+
+| GPIO0  | BOOTSTRAP_GPIOS        | Boot strap; ADC2 es erintes          |
+| GPIO1  | UART0_GPIOS            | UART0 TX; soros naplo/feltoltes      |
+| GPIO2  | BOOTSTRAP_GPIOS        | Boot strap; ADC2 es erintes          |
+| GPIO3  | UART0_GPIOS            | UART0 RX; soros feltoltes            |
+| GPIO4  | GENERAL_DIGITAL_GPIOS  | ADC2 es erintes; Wi-Fi mellett       |
+|        |                        | ADC2 analog meresre ne szamits       |
+| GPIO5  | BOOTSTRAP_GPIOS        | Boot strap; SPI CS szerep is lehet   |
+| GPIO12 | BOOTSTRAP_GPIOS        | Boot strap; ADC2, erintes, JTAG      |
+| GPIO13 | GENERAL_DIGITAL_GPIOS  | ADC2, erintes, JTAG                  |
+| GPIO14 | GENERAL_DIGITAL_GPIOS  | ADC2, erintes, JTAG                  |
+| GPIO15 | BOOTSTRAP_GPIOS        | Boot strap; ADC2, erintes, JTAG      |
+| GPIO16 | GENERAL_DIGITAL_GPIOS  | Digitalis I/O; panelen ellenorizd    |
+| GPIO17 | GENERAL_DIGITAL_GPIOS  | Digitalis I/O; panelen ellenorizd    |
+| GPIO18 | GENERAL_DIGITAL_GPIOS  | VSPI alapertelmezett SCK             |
+| GPIO19 | GENERAL_DIGITAL_GPIOS  | VSPI alapertelmezett MISO            |
+| GPIO21 | GENERAL_DIGITAL_GPIOS  | I2C alapertelmezett SDA               |
+| GPIO22 | GENERAL_DIGITAL_GPIOS  | I2C alapertelmezett SCL               |
+| GPIO23 | GENERAL_DIGITAL_GPIOS  | VSPI alapertelmezett MOSI             |
+| GPIO25 | GENERAL_DIGITAL_GPIOS  | ADC2; DAC1, de itt digitalis I/O     |
+| GPIO26 | GENERAL_DIGITAL_GPIOS  | ADC2; DAC2, de itt digitalis I/O     |
+| GPIO27 | GENERAL_DIGITAL_GPIOS  | ADC2 es erintes                       |
+| GPIO32 | ADC1_WIFI_SAFE_GPIOS   | ADC1; erintes; digitalis I/O         |
+| GPIO33 | ADC1_WIFI_SAFE_GPIOS   | ADC1; erintes; digitalis I/O         |
+| GPIO34 | ADC1_WIFI_SAFE_GPIOS   | ADC1; csak bemenet; nincs belso      |
+|        |                        | fel/le-huzo ellenallas                |
+| GPIO35 | ADC1_WIFI_SAFE_GPIOS   | ADC1; csak bemenet; nincs belso      |
+|        |                        | fel/le-huzo ellenallas                |
+| GPIO36 | ADC1_WIFI_SAFE_GPIOS   | ADC1; csak bemenet; nincs belso      |
+|        |                        | fel/le-huzo ellenallas                |
+| GPIO39 | ADC1_WIFI_SAFE_GPIOS   | ADC1; csak bemenet; nincs belso      |
+|        |                        | fel/le-huzo ellenallas                |
++--------+------------------------+--------------------------------------+
+
+
+########################################################################
+## 3. Csoportok reszletesen
+########################################################################
+
+ADC1_WIFI_SAFE_GPIOS:
+    GPIO32, GPIO33, GPIO34, GPIO35, GPIO36, GPIO39
+
+    Analog bemenetkent ezek a javasolt labak, ha a keszulek Wi-Fi-t is
+    hasznal. A GPIO34, GPIO35, GPIO36 es GPIO39 csak bemenet; digitalis
+    kimenetet ne tervezz rajuk. Ezeken nincs szoftveresen kapcsolhato belso
+    felhuzo vagy lehuzo ellenallas.
+
+BOOTSTRAP_GPIOS:
+    GPIO0, GPIO2, GPIO5, GPIO12, GPIO15
+
+    Ezek indulaskor boot konfiguracios szerepet kapnak. Kulso gomb,
+    ellenallas vagy periferia megvaltoztathatja az indulaskori logikai
+    szintet, ezert a kapcsolast ellenorizd az ESP32 adatlapja es a
+    fejleszto panel rajza alapjan.
+
+UART0_GPIOS:
+    GPIO1 = TX0
+    GPIO3 = RX0
+
+    A legtobb USB-s fejleszto panel ezeket soros feltoltesre es
+    hibakeresesre hasznalja. Mas celra csak akkor foglald le oket, ha a
+    soros kapcsolatot nem kell hasznalni.
+
+GENERAL_DIGITAL_GPIOS:
+    GPIO4, GPIO13, GPIO14, GPIO16, GPIO17, GPIO18, GPIO19, GPIO21, GPIO22,
+    GPIO23, GPIO25, GPIO26, GPIO27
+
+    A projektben altalanos digitalis I/O feladatokra szanthatoak. Gyakori
+    periferiakiosztas:
+        I2C:  GPIO21 = SDA, GPIO22 = SCL
+        VSPI: GPIO18 = SCK, GPIO19 = MISO, GPIO23 = MOSI
+    Ezek az alapertelmezett kiosztasok mas GPIO-kra is atiranyithatok.
+
+    A GPIO4, GPIO13, GPIO14, GPIO25, GPIO26 es GPIO27 ADC2 funkcioju is.
+    Az ADC2 analog merese Wi-Fi hasznalatakor korlatozott, ezert analog
+    szenzorhoz Wi-Fi mellett inkabb az ADC1_WIFI_SAFE_GPIOS csoportot
+    hasznald. A GPIO13 es GPIO14 JTAG-ra is hasznalhato; a GPIO25 es
+    GPIO26 DAC-kepes, de a jelenlegi projektben nincs szukseg DAC-ra.
+
+
+########################################################################
+## 4. Tapellatas - ezek nem GPIO-k
+########################################################################
+
++----------------+----------------------------------------------------+
+| Panel felirata | Szerep                                              |
++----------------+----------------------------------------------------+
+| USB            | A fejleszto panel szokasos, egyszeru tapellatasi    |
+|                | es programfeltoltesi csatlakozasa.                 |
+| 5V / VIN       | Kulso tapbemenet lehet, de a pontos hasznalat a    |
+|                | panel kapcsolasi rajzatol es kialakitasatol fugg.  |
+| 3V3            | A legtobb fejleszto panelen szabalyzott 3,3 V-os  |
+|                | tap; ne feltetelezd, hogy tapbemenet.               |
+| GND            | Fold / kozos referencia.                            |
++----------------+----------------------------------------------------+
+
+    A csupasz ESP32-WROOM-32 modulnak szabalyzott 3,3 V tap kell. 5 V-ot
+    ne kapcsolj kozvetlenul a modul 3V3 tapjara vagy GPIO labara.
+
+    Fejleszto panel kulso tapellatasanal csak a panelen jelolt bemenetet
+    hasznald. A VIN/5V es 3V3 labak szerepet a konkret panel dokumentacioja
+    alapjan ellenorizd.
+
+
+########################################################################
+## 5. Tervezesi megjegyzesek a szamologephez
+########################################################################
+
+- OLED I2C hasznalata eseten kezdd a GPIO21 (SDA) es GPIO22 (SCL)
+  kiosztassal, ha a panelen szabadok.
+- Gombmatrixhoz elso korben a szabad, kimenetkent is mukodo
+  GENERAL_DIGITAL_GPIOS labakbol valassz.
+- Bemeneti jelekhez az ADC1_WIFI_SAFE_GPIOS csoport GPIO34, GPIO35,
+  GPIO36 es GPIO39 laba csak bemenetkent jo; ezek kapcsolo- vagy
+  szenzor-bemenetnek alkalmasak, kimeneti sor/oszlopnak nem.
+- A GPIO0, GPIO2, GPIO5, GPIO12 es GPIO15 boot strap szerepet kap, ezert
+  a rajuk kotott gombmatrix vagy mas periferia ne kenyszeritse oket
+  helytelen szintre bekapcsolaskor.
+- A csoportositas elsoleges ajanlas, nem azt jelenti, hogy egy lab csak
+  egyetlen hardveres funkciot tud ellatni.
+- Minden GPIO 3,3 V logikai szintu. 5 V-os jelet ne adj kozvetlenul GPIO-ra.
+
+
+########################################################################
+## 6. Hivatkozasok
+########################################################################
+
+Espressif ESP-IDF GPIO es RTC GPIO dokumentacio:
+    https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/gpio.html
+
+Espressif ESP32-WROOM-32 adatlap:
+    https://documentation.espressif.com/esp32-wroom-32_datasheet_en.pdf
+
+Projekt hardverlista:
+    hardware_components.txt
