@@ -1,11 +1,23 @@
-Name: RSSignal
+Name: RSSignal(ESP32-WROOM-3) ## The part in parentheses is required because it specifies which ESP this module works with.
 
 The Resiris module which provides the GPIOs usage. Sending and receiving data from them.
 
-functions:
+functions: send_signal()
 
-constants: NORMAL_GPIOS, BOOT_GPIOS, 
+constants:
+    BOOTSTRAP_GPIO0, UART0_GPIO1, BOOTSTRAP_GPIO2, UART0_GPIO3,
+    GENERAL_DIGITAL_GPIO4, BOOTSTRAP_GPIO5, BOOTSTRAP_GPIO12,
+    GENERAL_DIGITAL_GPIO13, GENERAL_DIGITAL_GPIO14, BOOTSTRAP_GPIO15,
+    GENERAL_DIGITAL_GPIO16, GENERAL_DIGITAL_GPIO17, GENERAL_DIGITAL_GPIO18,
+    GENERAL_DIGITAL_GPIO19, GENERAL_DIGITAL_GPIO21, GENERAL_DIGITAL_GPIO22,
+    GENERAL_DIGITAL_GPIO23, GENERAL_DIGITAL_GPIO25, GENERAL_DIGITAL_GPIO26,
+    GENERAL_DIGITAL_GPIO27, ADC1_WIFI_SAFE_GPIO32, ADC1_WIFI_SAFE_GPIO33,
+    ADC1_WIFI_SAFE_GPIO34, ADC1_WIFI_SAFE_GPIO35, ADC1_WIFI_SAFE_GPIO36,
+    ADC1_WIFI_SAFE_GPIO39
 
-v pin : ModuleObject = RSSignal[GPIOS]
+v pin : ModuleObject = RSSignal[GENERAL_DIGITAL_GPIO4]
 
-pin.connect()
+fn function_name():
+    send_signal()
+
+pin.connect(function_name) # or pin.connect_and_call(function_name)
