@@ -7,12 +7,10 @@ functions:
     send_signal(GPIO_constant_name) # RSSignal.send_signal(RSSignal[GENERAL_DIGITAL_GPIO4]) or v pin int = RSSignal[GENERAL_DIGITAL_GPIO4] then RSSignal.send_signal(pin)
     stop_signal(GPIO_constant_name) # RSSignal.stop_signal(RSSignal[GENERAL_DIGITAL_GPIO4]) or v pin int = RSSignal[GENERAL_DIGITAL_GPIO4] then RSSignal.stop_signal(pin)
 
-    get_signal_mode(GPIO_constant_name) # gives back the given gpio's signal mode. TRUE or FASLE
-    get_digital_data(GPIO_constant_name) # gives back the given gpio's digital data.
+    get_signal_mode(GPIO_constant_name) # gives back the given gpio's signal mode. TRUE or FALSE
+    get_digital_data(GPIO_constant_name) # gives back the given gpio's digital data. TRUE for HIGH, FALSE for LOW.
     get_analog_data(GPIO_constant_name) # gives back the given gpio's analog data.
-    get_signal_state(GPIO_constant_name) # returns the current digital level: true for HIGH, false for LOW.
-    # This is a low-level GPIO reading, not automatic button detection; whether HIGH or LOW means "pressed" depends on the wiring.
-
+    # Throw an error if code tries to set GPIO34, GPIO35, GPIO36, or GPIO39 as outputs; these pins are input-only.
 
 constants:
     BOOTSTRAP_GPIO0 : int = 0

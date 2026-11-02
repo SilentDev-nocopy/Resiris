@@ -1,0 +1,60 @@
+Name: RSConvert
+
+This module converts plain text and whole numbers into other formats.
+
+It only converts values. It does not create ModuleObjects or change anything
+outside the program.
+
+Text support:
+    The first version supports ASCII text only. It must report an error if
+    the input contains other characters, including after decoding.
+
+functions:
+    to_base64(text) # Turns ASCII text into Base64.
+    from_base64(text) # Turns Base64 back into ASCII text.
+
+    text_to_hex(text) # Turns each text character into two lowercase hex digits.
+    hex_to_text(text) # Turns pairs of hex digits back into ASCII text.
+
+    integer_to_hex(number) # Turns a whole number into a hex string.
+    hex_to_integer(text) # Turns a hex string into a whole number.
+
+    url_encode(text) # Makes ASCII text safe to use in a URL.
+    url_decode(text) # Turns URL-encoded ASCII text back into text.
+
+Usage examples:
+    <include> RSConvert
+
+    v encoded string = RSConvert.to_base64("Resiris")
+    v decoded string = RSConvert.from_base64(encoded)
+
+    v hex_text string = RSConvert.text_to_hex("Hi")
+    v original_text string = RSConvert.hex_to_text(hex_text)
+
+    v number_hex string = RSConvert.integer_to_hex(255)
+    v number int = RSConvert.hex_to_integer(number_hex)
+
+    v url_text string = RSConvert.url_encode("hello world")
+    v original_url_text string = RSConvert.url_decode(url_text)
+
+Proposed rules:
+    - Base64 uses the usual Base64 characters and adds `=` at the end when
+      needed.
+    - Text-to-hex uses two lowercase hex digits for each character.
+    - Hex-to-text accepts uppercase or lowercase digits. It reports an error
+      if there is an odd number of digits or any character is not a hex digit.
+    - Integer-to-hex uses lowercase letters and does not add `0x` at the start.
+    - Hex-to-integer accepts uppercase or lowercase letters, with or without
+      `0x` at the start. How negative numbers and numbers that are too large
+      should work still needs to be decided.
+    - URL encoding leaves letters, numbers, `-`, `.`, `_`, and `~` unchanged.
+      It changes other characters into `%` followed by their hex value.
+      A space becomes `%20`, not `+`.
+    - The module must report an error for bad input. It must not silently
+      return an incomplete or misleading result. The exact error messages
+      still need to be decided.
+
+Implementation notes:
+    - These functions use the module function syntax:
+      `RSConvert.function_name(arguments)`.
+    - Functions return `string` or `int`. They do not need ModuleObjects.
