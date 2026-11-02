@@ -1,0 +1,236 @@
+########################################################################
+## Resiris modulok szintaxisa - rovid manko
+########################################################################
+
+Ez a fajl azt mutatja meg, hogyan nez ki egy modul hasznalata Resiris
+programbol, es milyen C++ reszek kellenek a modul megvalositasahoz.
+Nem a modul otletet specifikalja: a fuggvenyek pontos viselkedeset kulon
+modulleirasban kell meghatarozni.
+
+
+########################################################################
+## 1. Modul hasznalata Resiris kodban
+########################################################################
+
+Modul betoltese:
+    <include> MODULNEV
+
+Tobb modul is megadhato vesszovel:
+    <include> RSMath, RSBase
+
+A modult hasznalat elott be kell tolteni. A nev kis- es nagybetui szamitanak.
+
+
+Modulfuggveny meghivasa:
+    MODULNEV.fuggveny(argumentumok)
+
+Pelda:
+    <include> RSMath
+    v gyok float = RSMath.sqrt(25)
+
+A visszateresi erteket a nyelv megfelelo tipusaba kell tenni. A modulok
+argumentumkent es visszateresi ertekkent bool, int, float es string ertekeket
+fogadnak/tamogatnak; egy modul fuggvenye ezen kivul ModuleObject-et is
+visszaadhat.
+
+
+Modulkonstans elerese:
+    MODULNEV[KONSTANSNEV]
+
+Pelda:
+    <include> RSMath
+    v pi float = RSMath[PI]
+
+A konstans neve nem szovegkent, hanem azonosito formajaban szerepel a
+szogletes zarojelben.
+
+
+Modulobjektum letrehozasa es metódus hivasa:
+    v objektumnev ModuleObject = MODULNEV.letrehozo_fuggveny(argumentumok)
+    objektumnev.metodus(argumentumok)
+
+Pelda:
+    <include> RSBase
+    v timer ModuleObject = RSBase.await()
+    timer.set_timer(1.0)
+    v maradek float = timer.process()
+
+A modulobjektumot egy modul fuggvenye adja vissza. A rajta meghivott
+metodushoz a futtato a megfelelo modulhoz iranyitja a hivast.
+
+
+########################################################################
+## 2. Deklaracios alakok
+########################################################################
+
+Valtozo:
+    v nev tipus = ertek
+
+Konstans:
+    c nev tipus = ertek
+
+Fuggveny:
+    fn nev(parameterek):
+        [tabbal behuzott utasitasok]
+
+A deklaracioban nincs kettospont a nev es a tipus kozott.
+Helyes:
+    v timer ModuleObject = RSBase.await()
+
+Hibas:
+    c timer : ModuleObject = RSBase.await()
+
+A `c` konstans, vagyis az erteke nem irhato at. A `ModuleObject`-eket
+altalaban `v` valtozoban taroljuk, mert az objektum allapota a metodusokon
+keresztul valtozhat.
+
+
+########################################################################
+## 3. Egy natív C++ modul felepítese
+########################################################################
+
+A CppResy modulok jelenleg nem kulon betoltheto fajlok: a C++ alkalmazasba
+vannak forditva es a CLI regisztraciojaba kerulnek.
+
+Fajlok:
+    include/resiris/modules/modulnev.hpp
+    src/modules/modulnev.cpp
+
+A headerben levo modul-osztaly a `resiris::Module` osztalybol szarmazik.
+Legalabb ezeket a fuggvenyeket kell megvalositania:
+
+    module_name()
+        A Resiris kodban hasznalt pontos modulnevet adja vissza.
+
+    function_names()
+        A modul publikus fuggvenyeinek es ModuleObject-metodusainak neveit
+        adja vissza.
+
+    variables()
+        A publikus konstansok neveit es tipusait adja vissza.
+
+    call_function(name, args)
+        A `MODULNEV.fuggveny(...)` hivast kezeli. Az argumentumok `Value`
+        objektumok vektoraban erkeznek.
+
+    call_object_method(name, handle, args)
+        A modul sajat ModuleObject-en meghivott metodusokat kezeli.
+
+    get_constant(name)
+        A `MODULNEV[KONSTANS]` formaban kert konstans erteket adja vissza.
+
+Egyszerusitett C++ vaz:
+
+    class ExampleModule : public Module {
+    public:
+        std::string module_name() const override {
+            return "Example";
+        }
+
+        std::vector<std::string> function_names() const override {
+            return {"create", "do_work"};
+        }
+
+        std::map<std::string, std::string> variables() const override {
+            return {{"VERSION", "string"}};
+        }
+
+        Value call_function(const std::string& name,
+                            const std::vector<Value>& args) override;
+
+        Value call_object_method(
+            const std::string& name,
+            const std::shared_ptr<FrameAwareState>& handle,
+            const std::vector<Value>& args) override;
+
+        Value get_constant(const std::string& name) const override;
+    };
+
+Ez vazlat, a fejlecbe a megfelelo include-ok is szuksegesek. A fuggvenyek
+implementaciojaban ellenorizni kell az argumentumszamot, az argumentumok
+tipusat es az ervenyes tartomanyt. Hibás fuggveny- vagy metodusalairasnal
+`ModuleSignatureError`-t kell dobni; uzemelesi hiban `ModuleError`-t.
+
+
+########################################################################
+## 4. Modulobjektum es allapot
+########################################################################
+
+Ha a modulnak allapottarto objektuma van:
+
+    1. Egy modul-fuggveny letrehozza az allapotot.
+    2. A fuggveny egy `ModuleObject`-et ad vissza a modul nevével es
+       az allapotkezelo pointerrel.
+    3. A Resiris program az objektumot `ModuleObject` tipusu valtozoban tartja.
+    4. Az objektumon hivott fuggvenyek a `call_object_method`-ba erkeznek.
+
+Egyszerusitett C++ pelda:
+
+    struct ExampleState : FrameAwareState {
+        int value = 0;
+    };
+
+    // Letrehozo fuggveny eredmenye:
+    auto state = std::make_shared<ExampleState>();
+    return Value::make_module(
+        std::make_shared<ModuleObject>("Example", state));
+
+A modul metoduskezelese ellenorizze a handle tipusat, mielott az allapotot
+hasznalja. Ne taroljon vagy adjon vissza olyan tipusokat, amelyeket a
+Resiris modulrendszer nem tamogat.
+
+
+########################################################################
+## 5. RSSignal otlet - a szintaxisra vonatkozo megjegyzes
+########################################################################
+
+Az otletben szereplo sor:
+    c signal_name : ModuleObject = RSSignal[GPUIS]
+
+nem illeszkedik a jelenlegi nyelvi szintaxishoz:
+
+    - Deklaracioban nincs `:` a nev utan.
+    - A `c` konstans; modositott allapotu objektumhoz `v` valtozo javasolt.
+    - A `RSSignal[GPUIS]` modulkonstans-hozzaferes. A konstansok egyszeru
+      ertekek; a jelenlegi modulrendszerben nem ez hoz letre ModuleObject-et.
+
+Allapottarto objektum eseten a szintaktikai minta ez:
+
+    <include> RSSignal
+    v signal ModuleObject = RSSignal.letrehozo_fuggveny(argumentumok)
+    signal.connect()
+
+Ez csak szintaktikai minta, nem az RSSignal vegleges API-ja. A tenyleges
+letrehozo fuggveny, a `connect` argumentumai, visszateresi erteke,
+hibaesetei es a GPU-khoz valo hozzaferes szabalyai kulon dontest igenyelnek.
+
+
+########################################################################
+## 6. Hova kell bekotni a modult?
+########################################################################
+
+1. A header es a source fajl hozzaadasa a fenti mappakhoz.
+2. A source fajl felvetele a `CMakeLists.txt` fajlba.
+3. A header include-olasa a `src/cli.cpp` fajlban.
+4. A modul peldanyanak hozzaadasa a CLI `ModuleRegistry` listajahoz.
+5. Tesztek irasa a publikus fuggvenyekre, konstansokra, metodusokra,
+   argumentumokra, hibakra es dokumentalt allapotvaltozasokra.
+6. A hasznalati es kepessegleiras frissitese.
+
+Egy uj modul csak akkor hasznalhato Resiris programbol, ha a host alkalmazas
+regisztralja. A `modules/` mappaba helyezett fajlok onmagukban nem
+regisztralodnak automatikusan.
+
+
+########################################################################
+## 7. AI agent gyors ellenorzolista
+########################################################################
+
+[ ] A modulnevet a kod, a `<include>` pelda es a regisztracio ugyanugy irja.
+[ ] Minden fuggvenynek es metodusnak ismert az argumentumlistaja es eredmenye.
+[ ] A konstans `variables()` es `get_constant()` eredmenye osszhangban van.
+[ ] ModuleObject-et letrehozo fuggveny ad vissza, nem konstans-hozzaferes.
+[ ] Az objektum metodusaihoz a handle tipusellenorzese megvan.
+[ ] A hibas argumentumok es mukodesi hibak nem tunnek sikeres eredmenynek.
+[ ] A CMake, CLI-regisztracio, tesztek es dokumentacio frissitve van.
+[ ] A nem tisztazott viselkedes nincs kitalalva: fel van jegyezve vagy kerdezve.

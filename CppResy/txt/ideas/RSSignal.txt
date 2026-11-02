@@ -1,0 +1,11 @@
+Name: RSSignal
+
+The Resiris module which provides the GPUIs usage. Sending and receiving data from them.
+
+functions:
+
+constants: GPUIS
+
+v signal_name : ModuleObject = RSSignal[GPUIS]
+
+signal_name.connect()
