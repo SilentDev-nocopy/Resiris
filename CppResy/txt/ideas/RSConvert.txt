@@ -1,6 +1,6 @@
 Name: RSConvert
 
-This module converts plain text and whole numbers into other formats.
+This module converts plain text and numeric values into other formats.
 
 It only converts values. It does not create ModuleObjects or change anything
 outside the program.
@@ -58,6 +58,36 @@ functions:
     seconds_to_duration(seconds) # Formats seconds as HH:MM:SS.
     duration_to_seconds(text) # Parses an HH:MM:SS duration into seconds.
 
+    bytes_to_decimal_size(bytes) # Formats bytes using SI units (kB, MB, ...).
+    bytes_to_binary_size(bytes) # Formats bytes using IEC units (KiB, MiB, ...).
+    storage_size_to_bytes(text) # Parses a storage-size string into bytes.
+    bytes_to_bits(bytes) # Converts a byte count into bits.
+    bits_to_bytes(bits) # Converts a bit count into whole bytes.
+
+    integer_to_bytes(number, byte_count, byte_order) # Returns bytes as hex text.
+    bytes_to_integer(hex_text, byte_order) # Parses hex bytes as an integer.
+
+    signed_to_unsigned(number, bit_width) # Reinterprets a signed bit pattern.
+    unsigned_to_signed(number, bit_width) # Interprets an unsigned bit pattern.
+
+    float_to_bits(number, bit_width) # Encodes a float as IEEE 754 bits.
+    bits_to_float(bits) # Decodes an IEEE 754 bit string into a float.
+
+    integer_to_gray(number, bit_width) # Encodes an integer as Gray-code bits.
+    gray_to_integer(bits) # Decodes a Gray-code bit string.
+
+    integer_to_bcd(number) # Encodes a non-negative integer as BCD bits.
+    bcd_to_integer(bits) # Decodes BCD bits into a non-negative integer.
+
+    integer_to_leb128(number) # Encodes an integer as unsigned LEB128 hex bytes.
+    leb128_to_integer(hex_bytes) # Decodes unsigned LEB128 hex bytes.
+
+    signed_to_zigzag(number) # Maps a signed integer to a non-negative integer.
+    zigzag_to_signed(number) # Maps a ZigZag integer back to a signed integer.
+
+    decimal_to_fixed(value, fractional_bits) # Encodes a value as fixed-point.
+    fixed_to_decimal(number, fractional_bits) # Decodes a fixed-point integer.
+
     xml_escape(text) # Escapes special characters in XML text.
     xml_unescape(text) # Decodes supported XML entities.
 
@@ -97,6 +127,35 @@ Usage examples:
 
     v color string = RSConvert.rgb_to_hex(255, 128, 0)
     v duration string = RSConvert.seconds_to_duration(3661)
+
+    v decimal_size string = RSConvert.bytes_to_decimal_size(1500000)
+    v binary_size string = RSConvert.bytes_to_binary_size(1572864)
+    v byte_count int = RSConvert.storage_size_to_bytes("1.5 MiB")
+    v bit_count int = RSConvert.bytes_to_bits(4)
+
+    v byte_hex string = RSConvert.integer_to_bytes(4660, 2, "big")
+    v restored int = RSConvert.bytes_to_integer(byte_hex, "big")
+
+    v unsigned int = RSConvert.signed_to_unsigned(-1, 8)
+    v signed int = RSConvert.unsigned_to_signed(255, 8)
+
+    v float_bits string = RSConvert.float_to_bits(1.5, 32)
+    v restored_float float = RSConvert.bits_to_float(float_bits)
+
+    v gray_bits string = RSConvert.integer_to_gray(10, 4)
+    v gray_value int = RSConvert.gray_to_integer(gray_bits)
+
+    v bcd_bits string = RSConvert.integer_to_bcd(42)
+    v bcd_value int = RSConvert.bcd_to_integer(bcd_bits)
+
+    v leb_bytes string = RSConvert.integer_to_leb128(300)
+    v leb_value int = RSConvert.leb128_to_integer(leb_bytes)
+
+    v zigzag_value int = RSConvert.signed_to_zigzag(-10)
+    v signed_value int = RSConvert.zigzag_to_signed(zigzag_value)
+
+    v fixed_value int = RSConvert.decimal_to_fixed(1.5, 8)
+    v decimal_value float = RSConvert.fixed_to_decimal(fixed_value, 8)
 
 Proposed rules:
     - Base64 uses the usual Base64 characters and adds `=` at the end when
@@ -144,6 +203,54 @@ Proposed rules:
       Hours may exceed 23; minutes and seconds must be from 00 through 59.
       Parsing requires two or more hour digits and exactly two digits for
       minutes and seconds.
+    - Numeric arguments to byte/bit conversion functions are non-negative
+      whole counts. SI units use powers of 1000 (`kB`, `MB`, `GB`, `TB`, `PB`,
+      `EB`); IEC units use powers of 1024 (`KiB`, `MiB`, `GiB`, `TiB`, `PiB`,
+      `EiB`). `B` means bytes and `bit` means bits. Unit spelling and
+      capitalization are explicit; ambiguous abbreviations such as `KB` are
+      rejected.
+    - `bytes_to_decimal_size` and `bytes_to_binary_size` choose the largest
+      applicable unit, include at most two fractional digits, and remove
+      trailing zeroes. Parsing a size accepts a non-negative decimal number
+      and one supported unit; the result must represent a whole number of
+      bytes or it reports an error.
+    - Bit-to-byte conversion requires a bit count divisible by 8. Byte-to-bit
+      conversion reports an error if the result exceeds the integer range.
+    - Integer-to-bytes accepts a non-negative integer, a byte count from 1
+      through 8, and byte order `big` or `little`. It returns exactly two
+      lowercase hexadecimal digits per byte, so arbitrary binary bytes remain
+      representable under the module's ASCII-only text policy. It reports an
+      error if the integer does not fit in the requested number of bytes.
+      Bytes-to-integer accepts the same hex representation and byte orders;
+      it rejects empty, odd-length, or invalid hex input and values greater
+      than the language's maximum integer.
+    - Signed/unsigned reinterpretation accepts bit widths from 1 through 63
+      so every result fits in the language's signed integer type. Inputs must
+      fit the requested width. Conversion uses two's-complement representation
+      and reports errors for out-of-range values.
+    - Float bit conversion supports IEEE 754 binary32 (32 bits) and binary64
+      (64 bits). `float_to_bits` returns a string of exactly that many `0`/`1`
+      digits; `bits_to_float` infers the width from a 32- or 64-digit input.
+      It rejects other widths and non-bit characters.
+    - Gray-code conversion accepts non-negative integers and bit widths from
+      1 through 63. Encoding returns exactly `bit_width` bits and reports an
+      error if the value does not fit. Decoding accepts 1 through 63 bits.
+    - BCD uses four bits per decimal digit, most significant digit first.
+      Encoding includes one nibble for zero and does not add leading zeroes.
+      Decoding requires a non-empty multiple of four bits; each nibble must
+      represent a decimal digit from 0 through 9. The result must fit in `int`.
+    - LEB128 conversion uses unsigned LEB128 and represents its bytes as
+      two lowercase hex digits each, in encoded byte order. It supports
+      non-negative `int` values. Decoding rejects empty, malformed, overlong,
+      or out-of-range encodings.
+    - ZigZag conversion accepts signed integers from -(2^62) through
+      2^62-1, ensuring the mapped non-negative value fits in `int`. It uses
+      the standard mapping where 0 maps to 0, -1 to 1, 1 to 2, and so on.
+    - Fixed-point conversion uses a signed 64-bit integer representation with
+      `fractional_bits` from 0 through 62. Encoding multiplies by
+      2^fractional_bits and rounds to the nearest integer, with halfway values
+      rounded away from zero. It reports errors for non-finite or out-of-range
+      values; decoding divides by the same scale.
     - XML escaping handles `&`, `<`, `>`, `"`, and `'`. XML unescaping supports
       their five predefined named entities only; unsupported or malformed
       entities must report an error.
@@ -156,4 +263,5 @@ Proposed rules:
 Implementation notes:
     - These functions use the module function syntax:
       `RSConvert.function_name(arguments)`.
-    - Functions return `string` or `int`. They do not need ModuleObjects.
+    - Functions return `string`, `int`, or `float`. They do not need
+      ModuleObjects.
