@@ -1,0 +1,282 @@
+########################
+## 1. Language syntax
+########################################################################
+
+##:
+    Starts a comment. The tokenizer ignores the whole line.
+
+Indentation:
+    Code blocks use tab-based indentation.
+    A leading space is not a valid substitute for a tab.
+    Statements end at a newline.
+    A block starts with a colon and its code is indented.
+
+v:
+    Defines a variable, also called a variant. A type is required.
+    Examples:
+        v number int = 10
+        v speed float = 1.5
+
+c:
+    Defines a constant. Its value cannot be changed after definition.
+    Example:
+        c FPS float = 10.0
+
+fn:
+    Defines a function. A function is a named block of code that can be
+    called later. Parameters do not need a declared type.
+    Example:
+        fn add(a, b):
+            return a + b
+
+START():
+    The entry function. It runs once after the top-level code has run.
+    It does not take parameters.
+
+PROCESS(FPS):
+    A function that runs on every frame while the program is running.
+    Its parameter must be named FPS.
+    A global constant `c FPS float = ...` is required and its value must be
+    greater than 0.0.
+
+if:
+    Checks a condition. Its block runs only when the condition is true.
+
+elif:
+    Checks another condition when the previous if/elif condition was false.
+
+else:
+    Runs when the preceding if/elif conditions are false.
+
+mat:
+    Compares one value with multiple possible cases and runs the matching
+    branch. See `match_statement.txt` for the full description.
+
+return:
+    Stops the current function and optionally returns a value.
+
+pass:
+    Performs no operation. It is a placeholder for an empty block.
+    It does not stop the function or ignore code after the block.
+
+print_cmd():
+    Displays text or a value.
+    Example:
+        print_cmd("Hello World")
+        print_cmd(test_value)
+
+<include>:
+    Includes a module that is registered in the C++ application.
+    Examples:
+        <include> RSMath
+        <include> RSMath, RSBase
+
+
+########################################################################
+## 2. Variables, constants, and value types
+########################################################################
+
+UnknownObject:
+    A dynamically typed variant. It can store a supported value without
+    having a concrete type declared at the start.
+    Its concrete type cannot currently be requested with `.type()`.
+
+Typed variant:
+    A variant with a declared value type. Every assigned value must use
+    that type.
+    Example:
+        v score int = 10
+
+int:
+    Stores a whole number as a signed 64-bit integer.
+    Example:
+        v lives int = 3
+
+float:
+    Stores a number with a fractional part.
+    It is represented by a C++ double.
+    Example:
+        v speed float = 1.5
+
+string:
+    Stores text.
+    Example:
+        v player_name string = "Player"
+
+bool:
+    Stores true or false.
+    Example:
+        v is_alive bool = true
+
+ModuleObject:
+    Stores an object returned by a native module.
+    Example:
+        v timer ModuleObject = RSBase.await()
+
+FunctionalObject:
+    Stores a callable value created with FunctionalObject.new(...).
+
+Typed assignment:
+    int accepts int values.
+    float accepts float and int values. An int is converted to float.
+    string accepts string values only.
+    bool accepts bool values only.
+    ModuleObject and FunctionalObject accept their matching value types.
+    UnknownObject can store supported values without a fixed type.
+
+
+########################################################################
+## 3. Operations and operators
+########################################################################
+
++:
+    Adds two values. If both values are strings, they are joined together.
+    Example: total = number1 + number2
+
+-:
+    Subtracts the right value from the left value.
+    Example: difference = number1 - number2
+
+*:
+    Multiplies two values.
+    Example: area = width * height
+
+/:
+    Divides the left value by the right value.
+    The left value must be a float. An int on the left causes
+    IntDivisionError.
+    Example:
+        v result float = number.type(float) / 2.0
+
+%:
+    Returns the remainder after division.
+    Example: remainder = number1 % number2
+
+==:
+    Checks whether two values are equal. The result is true or false.
+
+!=:
+    Checks whether two values are different.
+
+>:
+    Checks whether the left value is greater than the right value.
+
+<:
+    Checks whether the left value is less than the right value.
+
+>=:
+    Checks whether the left value is greater than or equal to the right value.
+
+<=:
+    Checks whether the left value is less than or equal to the right value.
+
+=:
+    Assigns a value to a variant.
+    Example: score = 10
+
++=:
+    Adds a value to a variant and stores the result.
+    Example: score += 1
+
+-=:
+    Subtracts a value from a variant and stores the result.
+    Example: score -= 1
+
+*=:
+    Multiplies a variant by a value and stores the result.
+    Example: score *= 2
+
+/=:
+    Divides a variant by a value and stores the result.
+    Example: score /= 2
+
+str():
+    Converts a value into text.
+    Example: str(test_value)
+
+.type():
+    Gets the type of a value or converts it to another type.
+    See `type_operations.txt` for the supported types and conversion rules.
+
+.string():
+    Converts a value into text.
+
+
+########################################################################
+## 4. Functions and program execution
+########################################################################
+
+Function:
+    A function is defined with `fn` and can be called by its name.
+    Example:
+        fn greet(name):
+            print_cmd("Hello " + name)
+
+        greet("Resiris")
+
+Recursion:
+    A function can call itself.
+    CppResy does not have traditional for or while loops.
+
+FunctionalObject:
+    A callable value can be created with FunctionalObject.new(...).
+    Example:
+        v multiplier FunctionalObject = FunctionalObject.new(value):
+            return value * 3
+
+        print_cmd(multiplier(4))
+
+    Its body can access its own parameters and global variables, but it
+    does not capture local variables from where it was created.
+
+Program start:
+    Function and lifecycle definitions are registered first.
+    Other top-level statements run in source order.
+    START() runs once after the top-level code.
+    PROCESS(FPS) then runs through the CLI frame loop, if it is defined.
+
+
+########################################################################
+## 5. Modules
+########################################################################
+
+Modules:
+    CppResy uses native C++ modules. A module must be registered in the
+    application before a Resiris program can include it.
+
+<include>:
+    Includes a registered module.
+    Example:
+        <include> RSMath, RSBase
+
+Module functions:
+    Are called with the module name and a dot.
+    Example:
+        RSMath.sqrt(25)
+
+Module constants:
+    Are accessed with square brackets.
+    Example:
+        RSMath[PI]
+
+ModuleObject:
+    A module can return an object that can be stored in a ModuleObject
+    variant. Its methods can then be called with dot syntax.
+
+See `native_module_system.txt` for more information.
+
+
+########################################################################
+## 6. Current limitations
+########################################################################
+
+- There are no native arrays or collections.
+- There are no for or while loops.
+- Continuous execution uses PROCESS(FPS).
+- Modules are registered by the C++ application. They are not loaded
+  dynamically from a Modules folder.
+- The current CppResy CLI registers RSMath and RSBase.
+- int uses a signed 64-bit value.
+
+These descriptions follow the current CppResy implementation. A feature
+that was only discussed or planned is not considered implemented.

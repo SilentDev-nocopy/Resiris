@@ -1,0 +1,159 @@
+########################
+## 1. Modules
+########################################################################
+
+What is a Resiris module?
+    A module is a native C++ component that can be used from a Resiris
+    program. It provides functions, constants or objects.
+
+Current CppResy modules:
+    RSMath
+    RSBase
+
+The modules are compiled into the application. CppResy does not load module
+files dynamically from a Modules folder.
+
+
+########################################################################
+## 2. Including a module
+########################################################################
+
+<include>:
+    Includes a module that is registered in the C++ module registry.
+
+    Examples:
+        <include> RSMath
+        <include> RSBase
+        <include> RSMath, RSBase
+
+A module must be included before its functions or constants are used.
+
+Missing module:
+    `{ModuleName} not found! Error code:"MissingModule"`
+
+Including the same module more than once:
+    `{ModuleName} is already included. Error code:"SameModuleMultiCall"`
+
+The include statement does not have to be on the first line of the program.
+
+
+########################################################################
+## 3. Using module functions and constants
+########################################################################
+
+Module functions:
+    Module functions are called with the module name and a dot.
+    Examples:
+        RSMath.sqrt(25)
+        RSBase.await()
+
+Module constants:
+    Module constants are accessed with square brackets.
+    Examples:
+        RSMath[PI]
+        RSMath[E]
+
+Unknown function:
+    `{ModuleName}.{function}: unknown module function`
+
+Unknown constant:
+    `{ModuleName}.{constant}: unknown module constant`
+
+
+########################################################################
+## 4. ModuleObject
+########################################################################
+
+ModuleObject:
+    A module can return an object that is stored in a ModuleObject variant.
+
+    Example:
+        v timer ModuleObject = RSBase.await()
+
+Object methods:
+    The methods of a ModuleObject are called with dot syntax.
+
+    Example:
+        timer.set_timer(1.0)
+        timer.process()
+
+The interpreter sends the method call to the module that owns the object.
+
+
+########################################################################
+## 5. C++ module interface
+########################################################################
+
+A C++ module implements the `Module` interface from:
+    include/resiris/module.hpp
+
+The interface contains:
+    module_name()
+    function_names()
+    variables()
+    call_function(...)
+    call_object_method(...)
+    get_constant(...)
+
+The module provides its exported constants through `get_constant()`.
+The type declared in `variables()` is checked against the returned value.
+
+The module registry also provides these metadata values:
+    NAME:
+        The module name.
+
+    FUNCTIONS:
+        A comma-separated list of function names.
+
+    VARIABLES:
+        A comma-separated list of name:type entries.
+
+
+########################################################################
+## 6. Function arguments and return values
+########################################################################
+
+Supported module function arguments:
+    bool
+    int
+    float
+    string
+
+Other argument types are rejected with:
+    UnknownModuleArgument
+
+Supported module function return values:
+    bool
+    int
+    float
+    string
+    ModuleObject
+
+Other return types are rejected.
+
+A module function must check its own argument count and argument types.
+For an invalid function signature it throws `ModuleSignatureError`.
+
+
+########################################################################
+## 7. Adding a new C++ module
+########################################################################
+
+To add a module to CppResy:
+
+1. Implement the `Module` interface.
+2. Add the source file to `CppResy/CMakeLists.txt`.
+3. Include its header in `src/cli.cpp`.
+4. Register an instance in the module registry created by the CLI.
+5. Add tests and documentation.
+
+
+########################################################################
+## 8. Current limitations
+########################################################################
+
+- Modules are registered by the C++ application.
+- Loading modules from a folder at runtime is not implemented.
+- Module dependencies and version handling are not implemented.
+- There is no external C ABI or dynamic plugin file format.
+- Only modules registered by the host application can be used.

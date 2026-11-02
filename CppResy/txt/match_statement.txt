@@ -1,0 +1,182 @@
+What is the "mat" statement?
+    A statement which compares a given value against multiple possible cases.
+    It is built into the language. It is not a function or a module.
+
+
+2. What is the basic syntax of a "mat" statement?
+    The syntax looks like this:
+
+        mat variant_name:
+            1:
+                print_cmd("one")
+            2:
+                print_cmd("two")
+            else:
+                print_cmd("other")
+
+    The value after `mat` must be an existing variant/value. A literal
+    cannot be used directly.
+
+3. Can the value checked by "mat" be a normal variant without using
+   ".type()"?
+    Yes. It can check int, float, string, bool and other supported values.
+
+4. Can "mat" check a value by its type using ".type()"?
+    Yes. Use the `.type()` operation:
+
+        mat variant_name.type():
+            int:
+                print_cmd("Is int")
+            float:
+                print_cmd("Is float")
+
+5. Which values can be checked by "mat"?
+    int, float, string, bool and ModuleObject values can be checked.
+
+6. Can "mat" check an UnknownObject value?
+    No. UnknownObject cannot be used as the checked value.
+
+7. Can "mat" check a literal directly?
+    No. The value after `mat` must be a variable or a supported expression.
+
+8. Can the value checked by "mat" be a ".type()" result?
+    Yes.
+
+9. Can the value checked by "mat" be a ".string()" result?
+    Yes.
+
+10. Can the value checked by "mat" be the result of another function?
+    The checked value can be a supported expression. Dot calls are limited
+    to the built-in `.string()` and `.type()` operations.
+
+11. What can be used as a case value?
+    Cases use fixed values. Supported case values are:
+    - int
+    - float
+    - string
+    - bool
+
+12. Can a case contain an expression?
+    No.
+
+13. Can a case use a variable or constant instead of a fixed value?
+    No. A case must contain a concrete value.
+
+14. Can the same case value appear more than once?
+    No. A duplicate case gives an error:
+    `SameCaseMultiCall`
+
+15. Can different types be used as cases in the same "mat"?
+    No. All cases in one mat must use the same type.
+
+16. What happens if a case has a different type from the checked value?
+    It does not match. If no case matches, the `else` branch runs if one
+    was written. Otherwise execution continues after the mat.
+
+17. Is type matching based on exact type equality?
+    Yes. An int case is not the same as a float case.
+
+18. Does the order of cases matter?
+    No. The cases are compared by their values.
+
+19. Can "mat" contain multiple cases?
+    Yes.
+
+20. Can a "mat" contain an "else" branch?
+    Yes. The else branch must be the last branch.
+
+21. Can there be more than one "else" branch?
+    No.
+
+22. Can a "mat" have no cases and only an else branch?
+    No. At least one case is required.
+
+23. What happens when a case matches?
+    The matching branch runs. After that the mat ends and execution
+    continues with the next line after the whole mat. There is no fall-through.
+
+24. What happens when no case matches and there is no else?
+    Execution continues after the mat.
+
+25. Can cases contain multiple lines of code?
+    Yes. Every statement in the matching branch runs, unless a return or
+    an error stops it.
+
+26. Can a case contain another "mat"?
+    No. A mat cannot be nested inside another mat branch.
+    It gives `NestedMatchError`.
+
+27. Can "mat" be used inside functions?
+    Yes.
+
+28. Can "mat" be used inside if/elif/else blocks?
+    Yes.
+
+29. Can "mat" be used inside START() or PROCESS(FPS)?
+    Yes.
+
+30. Can "return" be used inside a mat case?
+    Yes. It returns from the surrounding function.
+
+31. Can "pass" be used inside a mat case?
+    Yes. It does nothing.
+
+32. Is the value checked by "mat" evaluated once or multiple times?
+    It is evaluated once.
+
+33. What happens if the value checked by "mat" does not exist?
+    The interpreter reports an error because the value cannot be found.
+
+34. What happens if a case value is invalid?
+    The parser reports `InvalidCaseValue`.
+
+35. What happens if a case has no body?
+    The parser reports `MissingCaseBody`.
+
+36. What happens if the mat body is empty?
+    The parser reports `EmptyMatchBody`.
+
+37. What happens if the mat syntax is invalid?
+    The parser reports a syntax error.
+
+38. What happens if a mat case has invalid indentation?
+    The parser reports an indentation error.
+
+39. What happens if an error occurs while the matching case is running?
+    The case stops running and the error is passed back to the surrounding
+    execution.
+
+40. Does the matching case stop after one statement?
+    No. It runs every statement in the matching branch, unless execution
+    is stopped by return or an error.
+
+
+###################################################
+# Example
+
+    fn describe(value):
+        mat value:
+            1:
+                return "one"
+            2:
+                return "two"
+            else:
+                return "other"
+
+    print_cmd(describe(2))
+
+
+###################################################
+# Implementation notes
+
+This description follows the current CppResy parser/interpreter.
+
+- The checked expression is evaluated once.
+- Case values must be fixed literals.
+- All cases in one mat must use the same type.
+- Duplicate cases are rejected.
+- Nested mat statements are not supported.
+- There is no fall-through between cases.
+
+Do not treat older ideas or features that are not implemented in CppResy
+as part of the current mat behaviour.
