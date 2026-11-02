@@ -1,23 +1,43 @@
-Name: RSSignal(ESP32-WROOM-3) ## The part in parentheses is required because it specifies which ESP this module works with.
+Name: RSSignal@ESP32-WROOM-32 ## The "@" is required because it specifies which ESP this module works with.
 
 The Resiris module which provides the GPIOs usage. Sending and receiving data from them.
 
-functions: send_signal()
+functions:
+    set_signal_mode(GPIO_constant_name, TRUE) #or FALSE
+    send_signal(GPIO_constant_name) # RSSignal.send_signal(RSSignal[GENERAL_DIGITAL_GPIO4]) or v pin int = RSSignal[GENERAL_DIGITAL_GPIO4] then RSSignal.send_signal(pin)
+    stop_signal(GPIO_constant_name) # RSSignal.stop_signal(RSSignal[GENERAL_DIGITAL_GPIO4]) or v pin int = RSSignal[GENERAL_DIGITAL_GPIO4] then RSSignal.stop_signal(pin)
+
+    get_signal_mode(GPIO_constant_name) # gives back the given gpio's signal mode. TRUE or FASLE
+    get_digital_data(GPIO_constant_name) # gives back the given gpio's digital data.
+    get_analog_data(GPIO_constant_name) # gives back the given gpio's analog data.
+    get_signal_state(GPIO_constant_name) # returns the current digital level: true for HIGH, false for LOW.
+    # This is a low-level GPIO reading, not automatic button detection; whether HIGH or LOW means "pressed" depends on the wiring.
+
 
 constants:
-    BOOTSTRAP_GPIO0, UART0_GPIO1, BOOTSTRAP_GPIO2, UART0_GPIO3,
-    GENERAL_DIGITAL_GPIO4, BOOTSTRAP_GPIO5, BOOTSTRAP_GPIO12,
-    GENERAL_DIGITAL_GPIO13, GENERAL_DIGITAL_GPIO14, BOOTSTRAP_GPIO15,
-    GENERAL_DIGITAL_GPIO16, GENERAL_DIGITAL_GPIO17, GENERAL_DIGITAL_GPIO18,
-    GENERAL_DIGITAL_GPIO19, GENERAL_DIGITAL_GPIO21, GENERAL_DIGITAL_GPIO22,
-    GENERAL_DIGITAL_GPIO23, GENERAL_DIGITAL_GPIO25, GENERAL_DIGITAL_GPIO26,
-    GENERAL_DIGITAL_GPIO27, ADC1_WIFI_SAFE_GPIO32, ADC1_WIFI_SAFE_GPIO33,
-    ADC1_WIFI_SAFE_GPIO34, ADC1_WIFI_SAFE_GPIO35, ADC1_WIFI_SAFE_GPIO36,
-    ADC1_WIFI_SAFE_GPIO39
-
-v pin : ModuleObject = RSSignal[GENERAL_DIGITAL_GPIO4]
-
-fn function_name():
-    send_signal()
-
-pin.connect(function_name) # or pin.connect_and_call(function_name)
+    BOOTSTRAP_GPIO0 : int = 0
+    UART0_GPIO1 : int = 1
+    BOOTSTRAP_GPIO2 : int = 2
+    UART0_GPIO3 : int = 3
+    GENERAL_DIGITAL_GPIO4 : int = 4
+    BOOTSTRAP_GPIO5 : int = 5
+    BOOTSTRAP_GPIO12 : int = 12
+    GENERAL_DIGITAL_GPIO13 : int = 13
+    GENERAL_DIGITAL_GPIO14 : int = 14
+    BOOTSTRAP_GPIO15 : int = 15
+    GENERAL_DIGITAL_GPIO16 : int = 16
+    GENERAL_DIGITAL_GPIO17 : int = 17
+    GENERAL_DIGITAL_GPIO18 : int = 18
+    GENERAL_DIGITAL_GPIO19 : int = 19
+    GENERAL_DIGITAL_GPIO21 : int = 21
+    GENERAL_DIGITAL_GPIO22 : int = 22
+    GENERAL_DIGITAL_GPIO23 : int = 23
+    GENERAL_DIGITAL_GPIO25 : int = 25
+    GENERAL_DIGITAL_GPIO26 : int = 26
+    GENERAL_DIGITAL_GPIO27 : int = 27
+    ADC1_WIFI_SAFE_GPIO32 : int = 32
+    ADC1_WIFI_SAFE_GPIO33 : int = 33
+    ADC1_WIFI_SAFE_GPIO34 : int = 34
+    ADC1_WIFI_SAFE_GPIO35 : int = 35
+    ADC1_WIFI_SAFE_GPIO36 : int = 36
+    ADC1_WIFI_SAFE_GPIO39 : int = 39
