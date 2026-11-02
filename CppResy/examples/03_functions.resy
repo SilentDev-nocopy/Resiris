@@ -14,8 +14,9 @@ fn double(value):
 print_cmd(double(21))
 
 ## A FunctionalObject is a value: it can be stored in a variable and called
-## later. Note that the `FunctionalObject.new(...)` form is only valid as the
-## value of a top level declaration, not inside a function body.
+## later. It does not capture enclosing locals: its body sees only its own
+## parameters and global variables. The FunctionalObject.new(...) form is the
+## only way to create one.
 v times3 FunctionalObject = FunctionalObject.new(value):
 	return value * 3
 
