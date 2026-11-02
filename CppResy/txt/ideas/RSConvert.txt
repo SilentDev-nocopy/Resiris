@@ -22,6 +22,47 @@ functions:
     url_encode(text) # Makes ASCII text safe to use in a URL.
     url_decode(text) # Turns URL-encoded ASCII text back into text.
 
+    integer_to_binary(number) # Turns a whole number into a binary string.
+    binary_to_integer(text) # Turns a binary string into a whole number.
+
+    integer_to_octal(number) # Turns a whole number into an octal string.
+    octal_to_integer(text) # Turns an octal string into a whole number.
+
+    integer_to_base(number, base) # Turns a whole number into a string in base 2-36.
+    base_to_integer(text, base) # Turns a string in base 2-36 into a whole number.
+
+    text_to_binary(text) # Turns each ASCII character into eight binary digits.
+    binary_to_text(text) # Turns groups of eight binary digits into ASCII text.
+
+    json_escape(text) # Escapes ASCII text for use in a JSON string.
+    json_unescape(text) # Decodes JSON string escapes into ASCII text.
+
+    html_escape(text) # Escapes special characters in HTML text.
+    html_unescape(text) # Decodes supported HTML entities.
+
+    csv_escape(text) # Escapes text as one CSV field.
+    csv_unescape(text) # Decodes one CSV field.
+
+    url_query_encode(text) # Encodes text using URL query-component rules.
+    url_query_decode(text) # Decodes URL query-component text.
+
+    ascii_to_integer(text) # Gets the ASCII code of one character.
+    integer_to_ascii(number) # Turns an ASCII code into one character.
+
+    integer_to_roman(number) # Turns a whole number into Roman numerals.
+    roman_to_integer(text) # Turns Roman numerals into a whole number.
+
+    rgb_to_hex(red, green, blue) # Turns RGB components into a #RRGGBB string.
+    hex_to_rgb(text) # Turns a #RRGGBB string into RGB components.
+
+    seconds_to_duration(seconds) # Formats seconds as HH:MM:SS.
+    duration_to_seconds(text) # Parses an HH:MM:SS duration into seconds.
+
+    xml_escape(text) # Escapes special characters in XML text.
+    xml_unescape(text) # Decodes supported XML entities.
+
+    newline_normalize(text) # Converts CRLF and CR line endings to LF.
+
 Usage examples:
     <include> RSConvert
 
@@ -37,6 +78,26 @@ Usage examples:
     v url_text string = RSConvert.url_encode("hello world")
     v original_url_text string = RSConvert.url_decode(url_text)
 
+    v binary_text string = RSConvert.integer_to_binary(10)
+    v number_from_binary int = RSConvert.binary_to_integer(binary_text)
+
+    v base_text string = RSConvert.integer_to_base(255, 16)
+    v number_from_base int = RSConvert.base_to_integer(base_text, 16)
+
+    v escaped_json string = RSConvert.json_escape("say \"hello\"")
+    v escaped_html string = RSConvert.html_escape("<hello>")
+    v escaped_csv string = RSConvert.csv_escape("hello, world")
+    v query_text string = RSConvert.url_query_encode("hello world")
+
+    v ascii_code int = RSConvert.ascii_to_integer("A")
+    v ascii_char string = RSConvert.integer_to_ascii(65)
+
+    v roman string = RSConvert.integer_to_roman(2024)
+    v year int = RSConvert.roman_to_integer(roman)
+
+    v color string = RSConvert.rgb_to_hex(255, 128, 0)
+    v duration string = RSConvert.seconds_to_duration(3661)
+
 Proposed rules:
     - Base64 uses the usual Base64 characters and adds `=` at the end when
       needed.
@@ -50,6 +111,44 @@ Proposed rules:
     - URL encoding leaves letters, numbers, `-`, `.`, `_`, and `~` unchanged.
       It changes other characters into `%` followed by their hex value.
       A space becomes `%20`, not `+`.
+    - Binary and octal integer strings do not have `0b` or `0o` prefixes.
+      Binary-to-integer accepts only `0` and `1`; octal-to-integer accepts
+      only digits `0` through `7`.
+    - Base conversion accepts bases from 2 through 36. Output uses lowercase
+      letters for digits above 9; input accepts uppercase or lowercase letters.
+      Invalid bases and digits must report an error.
+    - Text-to-binary uses exactly eight bits per ASCII character. The reverse
+      conversion requires a whole number of eight-bit groups and reports an
+      error if a decoded byte is not ASCII.
+    - JSON escaping handles quotes, backslashes, and control characters using
+      JSON escapes. JSON unescaping rejects malformed escapes and decoded
+      non-ASCII characters, consistent with the module's ASCII-only policy.
+    - HTML escaping handles `&`, `<`, `>`, `"`, and `'`. HTML unescaping
+      supports the corresponding named entities only; unsupported or malformed
+      entities must report an error.
+    - CSV conversion handles exactly one field. Escaping quotes fields that
+      contain commas, quotes, or line breaks, and doubles embedded quotes.
+      Unescaping rejects malformed quoted fields and trailing extra data.
+    - URL query-component encoding uses the same unreserved characters as
+      `url_encode`, but encodes a space as `+`. Decoding converts `+` to a
+      space and rejects malformed percent escapes.
+    - ASCII conversion accepts exactly one ASCII character or a code from
+      0 through 127. Other input must report an error.
+    - Roman numerals use the standard subtractive notation and support values
+      from 1 through 3999. Parsing accepts uppercase numerals and rejects
+      invalid or non-canonical forms.
+    - RGB components must each be integers from 0 through 255. Hex colors use
+      exactly six hexadecimal digits, with an optional leading `#`; parsing
+      accepts uppercase or lowercase digits.
+    - Durations use non-negative whole seconds and the `HH:MM:SS` format.
+      Hours may exceed 23; minutes and seconds must be from 00 through 59.
+      Parsing requires two or more hour digits and exactly two digits for
+      minutes and seconds.
+    - XML escaping handles `&`, `<`, `>`, `"`, and `'`. XML unescaping supports
+      their five predefined named entities only; unsupported or malformed
+      entities must report an error.
+    - Newline normalization converts CRLF and standalone CR to LF and leaves
+      all other characters unchanged.
     - The module must report an error for bad input. It must not silently
       return an incomplete or misleading result. The exact error messages
       still need to be decided.
