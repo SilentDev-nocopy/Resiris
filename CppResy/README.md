@@ -82,8 +82,8 @@ diff /tmp/py.txt /tmp/cpp.txt && echo identical
 
 | Path | Contents |
 | --- | --- |
-| `include/resiris/`, `src/` | tokenizer, parser, interpreter, modules, CLI |
-| `include/resiris/rsmath.hpp`, `include/resiris/rsbase.hpp` | the two built-in modules |
+| `include/resiris/`, `src/` | tokenizer, parser, interpreter, CLI |
+| `include/resiris/modules/`, `src/modules/` | built-in modules |
 | `examples/` | runnable example programs |
 | `tests/` | Catch2 suite and the differential fixtures |
 | `tools/` | `differential_test.sh`, `audit_sweep.py`, `uninstall.sh` |

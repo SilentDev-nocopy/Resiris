@@ -1,4 +1,4 @@
-#include "resiris/rsbase.hpp"
+#include "resiris/modules/rsbase.hpp"
 
 #include <cstdlib>
 

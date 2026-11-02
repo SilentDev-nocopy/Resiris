@@ -14,8 +14,8 @@ add_library(resiris
   src/tokenizer.cpp
   src/parser.cpp
   src/interpreter.cpp
-  src/rsmath.cpp
-  src/rsbase.cpp
+  src/modules/rsmath.cpp
+  src/modules/rsbase.cpp
 )
 target_include_directories(resiris PUBLIC include)
 target_compile_options(resiris PRIVATE -Wall -Wextra)

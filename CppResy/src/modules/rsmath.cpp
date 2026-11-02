@@ -1,4 +1,4 @@
-#include "resiris/rsmath.hpp"
+#include "resiris/modules/rsmath.hpp"
 
 #include <algorithm>
 #include <cmath>

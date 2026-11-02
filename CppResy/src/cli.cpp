@@ -12,8 +12,8 @@
 
 #include "resiris/interpreter.hpp"
 #include "resiris/parser.hpp"
-#include "resiris/rsbase.hpp"
-#include "resiris/rsmath.hpp"
+#include "resiris/modules/rsbase.hpp"
+#include "resiris/modules/rsmath.hpp"
 #include "resiris/syntax_error.hpp"
 #include "resiris/tokenizer.hpp"
 #include "resiris/version.hpp"
