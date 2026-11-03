@@ -53,7 +53,9 @@ functions:
     roman_to_integer(text) # Turns Roman numerals into a whole number.
 
     rgb_to_hex(red, green, blue) # Turns RGB components into a #RRGGBB string.
-    hex_to_rgb(text) # Turns a #RRGGBB string into RGB components.
+    hex_to_red(text) # Gets the red component from a #RRGGBB string.
+    hex_to_green(text) # Gets the green component from a #RRGGBB string.
+    hex_to_blue(text) # Gets the blue component from a #RRGGBB string.
 
     seconds_to_duration(seconds) # Formats seconds as HH:MM:SS.
     duration_to_seconds(text) # Parses an HH:MM:SS duration into seconds.
@@ -140,6 +142,9 @@ Usage examples:
     v year int = RSConvert.roman_to_integer(roman)
 
     v color string = RSConvert.rgb_to_hex(255, 128, 0)
+    v color_red int = RSConvert.hex_to_red(color)
+    v color_green int = RSConvert.hex_to_green(color)
+    v color_blue int = RSConvert.hex_to_blue(color)
     v duration string = RSConvert.seconds_to_duration(3661)
 
     v decimal_size string = RSConvert.bytes_to_decimal_size(1500000)
@@ -224,7 +229,8 @@ Proposed rules:
       invalid or non-canonical forms.
     - RGB components must each be integers from 0 through 255. Hex colors use
       exactly six hexadecimal digits, with an optional leading `#`; parsing
-      accepts uppercase or lowercase digits.
+      accepts uppercase or lowercase digits. `hex_to_red`, `hex_to_green`,
+      and `hex_to_blue` each return one integer component.
     - Durations use non-negative whole seconds and the `HH:MM:SS` format.
       Hours may exceed 23; minutes and seconds must be from 00 through 59.
       Parsing requires two or more hour digits and exactly two digits for
