@@ -1,0 +1,111 @@
+RSConvert module - current CppResy CLI
+======================================
+
+RSConvert is compiled into the CLI and runs on the desktop. It is stateless,
+exports no constants, and returns scalar values only. Include it with
+`<include> RSConvert`.
+
+Text input and decoded text output are ASCII-only (character values 0..127).
+Binary data is represented as hex or bit strings. Invalid data and values
+outside a function's supported range raise an error instead of returning a
+partial result.
+
+API
+---
+
+Text encodings:
+    to_base64(text), from_base64(text)
+    text_to_hex(text), hex_to_text(text)
+    integer_to_hex(number), hex_to_integer(text)
+    url_encode(text), url_decode(text)
+    integer_to_binary(number), binary_to_integer(text)
+    integer_to_octal(number), octal_to_integer(text)
+    integer_to_base(number, base), base_to_integer(text, base)
+    text_to_binary(text), binary_to_text(text)
+
+Escaping:
+    json_escape(text), json_unescape(text)
+    html_escape(text), html_unescape(text)
+    xml_escape(text), xml_unescape(text)
+    csv_escape(text), csv_unescape(text)
+    url_query_encode(text), url_query_decode(text)
+
+Characters and numbers:
+    ascii_to_integer(text), integer_to_ascii(number)
+    integer_to_roman(number), roman_to_integer(text)
+
+Colors and time:
+    rgb_to_hex(red, green, blue)
+    hex_to_red(text), hex_to_green(text), hex_to_blue(text)
+    seconds_to_duration(seconds), duration_to_seconds(text)
+
+Sizes:
+    bytes_to_decimal_size(bytes), bytes_to_binary_size(bytes)
+    storage_size_to_bytes(text), bytes_to_bits(bytes), bits_to_bytes(bits)
+
+Binary and fixed-point helpers:
+    integer_to_bytes(number, byte_count, byte_order)
+    bytes_to_integer(hex_text, byte_order)
+    signed_to_unsigned(number, bit_width)
+    unsigned_to_signed(number, bit_width)
+    float_to_bits(number, bit_width), bits_to_float(bits)
+    integer_to_gray(number, bit_width), gray_to_integer(bits)
+    integer_to_bcd(number), bcd_to_integer(bits)
+    integer_to_leb128(number), leb128_to_integer(hex_bytes)
+    signed_to_zigzag(number), zigzag_to_signed(number)
+    decimal_to_fixed(value, fractional_bits)
+    fixed_to_decimal(number, fractional_bits)
+    rgb888_to_rgb565(red, green, blue)
+    rgb565_to_red(color), rgb565_to_green(color), rgb565_to_blue(color)
+    pcm_sample_to_bytes(sample, bit_width, byte_order)
+    bytes_to_pcm_sample(hex_bytes, bit_width, byte_order)
+    signed_to_offset_binary(sample, bit_width)
+    offset_binary_to_signed(code, bit_width)
+    extract_bit_field(number, start_bit, width)
+    replace_bit_field(number, start_bit, width, value)
+
+Newline handling:
+    newline_normalize(text)
+
+Validation summary
+------------------
+
+- The module currently exports 68 names. It has no module constants or object
+  methods.
+- Text conversions enforce ASCII, including the output of decoders.
+- Integer/base conversion uses bases 2 through 36. Hex input accepts an
+  optional `0x` prefix; integer-to-hex output has no prefix.
+- Roman numerals support canonical values 1 through 3999.
+- RGB components are integers 0 through 255. Hex colors contain exactly six
+  hexadecimal digits, optionally prefixed with `#`.
+- Durations use `HH:MM:SS`; hours may be longer than two digits, minutes and
+  seconds are two digits from 00 to 59.
+- SI storage units use powers of 1000; IEC units use powers of 1024. The
+  parser recognizes `B`, `bit`, `kB` through `EB`, and `KiB` through `EiB`;
+  ambiguous `KB` is not accepted. The converted size must be a whole number
+  of bytes.
+- Bit widths and byte counts are checked per function. Integer widths are
+  limited to at most 63 bits where needed to keep values in signed `int`.
+  IEEE 754 conversion supports 16-, 32- and 64-bit formats. PCM and
+  offset-binary helpers support 8-, 16-, 24- and 32-bit samples.
+- Byte order must be exactly `"big"` or `"little"`. Hex byte strings use two
+  hex digits per byte. Bit positions start at zero for the least significant
+  bit.
+- `url_encode` encodes spaces as `%20`; query encoding uses `+`. Newline
+  normalization converts CRLF and lone CR to LF.
+
+Use the function declarations in `include/resiris/modules/rsconvert.hpp` as
+the authoritative list of exported names. The detailed design notes in
+`txt/ideas/RSConvert.txt` are historical; this reference and the current
+implementation take precedence if they differ.
+
+Example
+-------
+
+    <include> RSConvert
+    print_cmd(RSConvert.to_base64("Resiris"))           ## UmVzaXJpcw==
+    print_cmd(RSConvert.hex_to_integer("0xFF"))         ## 255
+    print_cmd(RSConvert.integer_to_roman(2024))          ## MMXXIV
+    print_cmd(RSConvert.bytes_to_binary_size(1572864))  ## 1.5 MiB
+
+`tests/test_rsconvert.cpp` exercises the current implementation.

@@ -4,7 +4,7 @@
 
 RSBase:
     A native C++ module registered by the CppResy CLI.
-    It provides a timer object that uses the PROCESS frame clock.
+    It provides timer objects driven by the interpreter's PROCESS frame clock.
 
 Include:
     <include> RSBase
@@ -36,6 +36,8 @@ on_timeout(function_name):
     Sets the name of a Resiris function that runs when the timer expires.
     It takes one string argument.
     The callback runs once when `process()` detects that the timer expired.
+    The name is not checked when set; it must resolve to a callable Resiris
+    function when the timeout callback is dispatched.
     Returns the same timer object.
 
 reset_timer():
@@ -55,12 +57,13 @@ free_timer():
     Returns the same timer object.
 
 process():
-    Checks the timer using the current PROCESS frame time.
+    Checks the timer using the current interpreter frame time.
     It takes no arguments.
 
-    Returns the remaining time as a float while the timer is running.
-    Returns 0.0 when the timer expires or is stopped.
-    When the timer reaches zero, the registered callback is scheduled once.
+    Returns the remaining time as a float while the timer is running and has
+    time left. Returns 0.0 if it has not been started, is stopped, or has
+    expired. When it first detects expiry, the registered callback is queued
+    and invoked by the interpreter after the method call completes.
 
 
 ########################################################################
@@ -69,12 +72,14 @@ process():
 
 - RSBase does not use a separate real-time clock.
 - The interpreter gives the timer the current frame time.
-- The frame clock advances once per PROCESS frame by `1 / FPS`.
+- The frame clock advances once per PROCESS frame by `1 / FPS`, before that
+  frame's body runs.
 - The timer's accuracy therefore depends on the FPS value.
 - If PROCESS is not running, the timer does not advance.
 - `process()` must be called from the running program to check the timer.
-- The callback name must match a Resiris function that exists when the
-  callback is called.
+- `process()` returns the remaining duration, not a bool.
+- A negative duration is accepted by the current implementation and will be
+  considered expired on the next `process()` call.
 
 
 ########################################################################
@@ -91,7 +96,8 @@ process():
         print_cmd("timer finished")
 
     START():
-        timer.set_timer(0.5).on_timeout("timer_done")
+        timer.set_timer(0.5)
+        timer.on_timeout("timer_done")
 
     PROCESS(FPS):
         remaining = timer.process()
@@ -107,5 +113,6 @@ process():
 - `set_timer`, `on_timeout`, `reset_timer`, `stop_timer`, `free_timer`
   and `process` are object methods.
 - `RSBase.await()` creates the timer object.
-- `free_timer()` marks the timer as freed and stops it. There is no separate
-  Resiris delete statement for this object.
+- `free_timer()` stops the timer and marks its internal state as freed; it
+  does not invalidate the Resiris handle, and `set_timer()` or
+  `reset_timer()` can start it again.

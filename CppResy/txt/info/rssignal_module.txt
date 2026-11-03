@@ -1,0 +1,77 @@
+RSSignal module - current CppResy CLI
+=====================================
+
+The CppResy CLI is a desktop program. Its RSSignal module is a deterministic
+in-memory simulation, not an ESP32 hardware driver. Include it with
+`<include> RSSignal`.
+
+Each module instance starts with pins in input mode and digital LOW. A pin's
+mode and digital output level are stored in the module's maps. Switching a pin
+to input resets its simulated digital level to LOW. Analog reads on supported
+ADC1 pins return `0.0`; there is no physical ADC.
+
+Functions
+---------
+
+    set_signal_mode(pin, output)
+        Set a known pin to input (false) or output (true). Returns bool true.
+        GPIO34, 35, 36 and 39 cannot be outputs.
+
+    send_signal(pin)
+        Set a configured output HIGH. Returns bool true.
+
+    stop_signal(pin)
+        Set a configured output LOW. Returns bool true.
+
+    get_signal_mode(pin)
+        Return bool: true for output, false for input.
+
+    get_digital_data(pin)
+        Return the simulated digital level as bool. This reads the stored
+        level, not a physical input.
+
+    get_analog_data(pin)
+        Return float 0.0 for one of the ADC1 pins. Other known pins produce
+        an error.
+
+The pin argument must be an int pin number. `set_signal_mode` also requires a
+bool output argument. A pin must be configured as an output before
+`send_signal` or `stop_signal` is called. Unknown pin numbers, wrong
+argument counts/types, output attempts on input-only pins, and analog reads
+from non-ADC pins raise errors.
+
+Constants
+---------
+
+All 26 constants have type int and their value is the GPIO number.
+
+    Bootstrap:       BOOTSTRAP_GPIO0, BOOTSTRAP_GPIO2, BOOTSTRAP_GPIO5,
+                     BOOTSTRAP_GPIO12, BOOTSTRAP_GPIO15
+    UART0:           UART0_GPIO1, UART0_GPIO3
+    General digital: GENERAL_DIGITAL_GPIO4, GENERAL_DIGITAL_GPIO13,
+                     GENERAL_DIGITAL_GPIO14, GENERAL_DIGITAL_GPIO16,
+                     GENERAL_DIGITAL_GPIO17, GENERAL_DIGITAL_GPIO18,
+                     GENERAL_DIGITAL_GPIO19, GENERAL_DIGITAL_GPIO21,
+                     GENERAL_DIGITAL_GPIO22, GENERAL_DIGITAL_GPIO23,
+                     GENERAL_DIGITAL_GPIO25, GENERAL_DIGITAL_GPIO26,
+                     GENERAL_DIGITAL_GPIO27
+    ADC1:            ADC1_WIFI_SAFE_GPIO32, ADC1_WIFI_SAFE_GPIO33,
+                     ADC1_WIFI_SAFE_GPIO34, ADC1_WIFI_SAFE_GPIO35,
+                     ADC1_WIFI_SAFE_GPIO36, ADC1_WIFI_SAFE_GPIO39
+
+The names and pin limitations follow the ESP32-WROOM-32 map, but the desktop
+implementation only simulates state. For physical pin characteristics and
+wiring cautions, see `esp32_gpio_table.txt`; that hardware reference does not
+mean this CLI accesses those pins.
+
+Example
+-------
+
+    <include> RSSignal
+    v led int = RSSignal[GENERAL_DIGITAL_GPIO4]
+    RSSignal.set_signal_mode(led, true)
+    RSSignal.send_signal(led)
+    v high bool = RSSignal.get_digital_data(led)
+    RSSignal.stop_signal(led)
+
+`tests/test_rssignal.cpp` verifies the simulated behavior.

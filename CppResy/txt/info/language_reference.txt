@@ -8,6 +8,8 @@
 Indentation:
     Code blocks use tab-based indentation.
     A leading space is not a valid substitute for a tab.
+    Text examples in this reference may use visual spaces; source files must
+    use tabs for indentation.
     Statements end at a newline.
     A block starts with a colon and its code is indented.
 
@@ -49,8 +51,8 @@ else:
     Runs when the preceding if/elif conditions are false.
 
 mat:
-    Compares one value with multiple possible cases and runs the matching
-    branch. See `match_statement.txt` for the full description.
+    Evaluates a non-literal expression once, compares it with fixed cases,
+    and runs the matching branch. See `match_statement.txt` for details.
 
 return:
     Stops the current function and optionally returns a value.
@@ -77,9 +79,12 @@ print_cmd():
 ########################################################################
 
 UnknownObject:
-    A dynamically typed variant. It can store a supported value without
-    having a concrete type declared at the start.
-    Its concrete type cannot currently be requested with `.type()`.
+    A declaration form whose value's type is inferred from its initializer.
+    The value can be a supported scalar or a ModuleObject. The inferred type
+    is fixed for later assignments. FunctionalObject values must be declared
+    as FunctionalObject, not UnknownObject.
+    `.type()` works when the stored runtime value has a determinable type;
+    FunctionalObject has no supported type conversion.
 
 Typed variant:
     A variant with a declared value type. Every assigned value must use
@@ -122,7 +127,8 @@ Typed assignment:
     string accepts string values only.
     bool accepts bool values only.
     ModuleObject and FunctionalObject accept their matching value types.
-    UnknownObject can store supported values without a fixed type.
+    UnknownObject infers its concrete type at initialization; later
+    assignments must conform to that inferred type.
 
 
 ########################################################################
@@ -233,7 +239,9 @@ Program start:
     Function and lifecycle definitions are registered first.
     Other top-level statements run in source order.
     START() runs once after the top-level code.
-    PROCESS(FPS) then runs through the CLI frame loop, if it is defined.
+    The CLI runs PROCESS(FPS) repeatedly after START(), if it is defined.
+    Its frame clock advances by 1/FPS; the CLI sleeps between frames to
+    maintain the requested rate and Ctrl+C stops the process loop.
 
 
 ########################################################################
@@ -241,8 +249,9 @@ Program start:
 ########################################################################
 
 Modules:
-    CppResy uses native C++ modules. A module must be registered in the
-    application before a Resiris program can include it.
+    CppResy uses native C++ modules. The CLI currently registers RSMath,
+    RSBase, RSConvert, and RSSignal. A program must include a registered
+    module before using it.
 
 <include>:
     Includes a registered module.
@@ -276,6 +285,8 @@ See `native_module_system.txt` for more information.
 - Modules are registered by the C++ application. They are not loaded
   dynamically from a Modules folder.
 - The current CppResy CLI registers RSMath, RSBase, RSConvert, and RSSignal.
+- RSSignal simulates GPIO state in memory on this desktop build; it does not
+  access physical ESP32 hardware.
 - int uses a signed 64-bit value.
 
 These descriptions follow the current CppResy implementation. A feature

@@ -15,6 +15,11 @@ Current CppResy modules:
 The modules are compiled into the application. CppResy does not load module
 files dynamically from a Modules folder.
 
+The CLI is a desktop program. In this build RSSignal is a stateful simulation;
+it does not access physical ESP32 pins or an ADC. See
+`rssignal_module.txt` for its simulated behavior and
+`esp32_gpio_table.txt` for hardware planning information.
+
 
 ########################################################################
 ## 2. Including a module
@@ -97,7 +102,11 @@ The interface contains:
     call_object_method(...)
     get_constant(...)
 
-The module provides its exported constants through `get_constant()`.
+These are six pure virtual methods. Object method names must also appear in
+`function_names()`. The CLI constructs the modules explicitly in `src/cli.cpp`.
+
+The module provides its exported constants through `variables()` and
+`get_constant()`.
 The type declared in `variables()` is checked against the returned value.
 
 The module registry also provides these metadata values:
@@ -109,6 +118,8 @@ The module registry also provides these metadata values:
 
     VARIABLES:
         A comma-separated list of name:type entries.
+    These three values are provided by ModuleRegistry and do not need to be
+    implemented by `get_constant()`.
 
 
 ########################################################################
@@ -133,8 +144,13 @@ Supported module function return values:
 
 Other return types are rejected.
 
-A module function must check its own argument count and argument types.
+A module function must check its own argument count and any function-specific
+argument types.
 For an invalid function signature it throws `ModuleSignatureError`.
+
+The registry only permits bool, int, float and string arguments. It permits
+bool, int, float, string and ModuleObject results. Constants must match the
+type declared by `variables()`.
 
 
 ########################################################################
@@ -144,10 +160,12 @@ For an invalid function signature it throws `ModuleSignatureError`.
 To add a module to CppResy:
 
 1. Implement the `Module` interface.
-2. Add the source file to `CppResy/CMakeLists.txt`.
+2. Add the source file to `CMakeLists.txt`.
 3. Include its header in `src/cli.cpp`.
-4. Register an instance in the module registry created by the CLI.
-5. Add tests and documentation.
+4. Register an instance in the vector passed to `ModuleRegistry`.
+5. Add tests and a module reference under `txt/info/`.
+6. Add the module and its reference to the current-module list in
+   `language_reference.txt`, this document, and `README.md`.
 
 
 ########################################################################

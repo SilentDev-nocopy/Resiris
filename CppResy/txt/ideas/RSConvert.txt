@@ -1,3 +1,13 @@
+HISTORICAL DESIGN NOTES - NOT THE API REFERENCE
+==============================================
+
+RSConvert is implemented in the current CppResy CLI. This file records the
+original design/rule notes and may contain draft wording; consult
+`../info/rsconvert_module.txt` for the current exported API and
+`../../include/resiris/modules/rsconvert.hpp` for the authoritative function
+list. If a design note differs from the implementation, the implementation
+and current API reference take precedence.
+
 Name: RSConvert
 
 This module converts plain text and numeric values into other formats.

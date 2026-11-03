@@ -6,7 +6,7 @@ What is the "mat" statement?
 2. What is the basic syntax of a "mat" statement?
     The syntax looks like this:
 
-        mat variant_name:
+        mat expression:
             1:
                 print_cmd("one")
             2:
@@ -14,12 +14,14 @@ What is the "mat" statement?
             else:
                 print_cmd("other")
 
-    The value after `mat` must be an existing variant/value. A literal
-    cannot be used directly.
+    The expression after `mat` must not be a literal by itself. A variable,
+    conversion, supported call, or other expression may be used if the
+    resulting value has a determinable runtime type.
 
-3. Can the value checked by "mat" be a normal variant without using
+3. Can the value checked by "mat" be a normal variable without using
    ".type()"?
-    Yes. It can check int, float, string, bool and other supported values.
+    Yes. It can check values with a determinable runtime type, including
+    int, float, string, bool, and ModuleObject.
 
 4. Can "mat" check a value by its type using ".type()"?
     Yes. Use the `.type()` operation:
@@ -32,9 +34,13 @@ What is the "mat" statement?
 
 5. Which values can be checked by "mat"?
     int, float, string, bool and ModuleObject values can be checked.
+    FunctionalObject cannot be checked because the interpreter cannot infer
+    its type. An UnknownObject containing a scalar or ModuleObject can be
+    checked because its stored runtime value has a concrete type.
 
 6. Can "mat" check an UnknownObject value?
-    No. UnknownObject cannot be used as the checked value.
+    Yes, if it contains a value with a determinable runtime type. `UnknownObject`
+    is a declaration type; it is not the runtime type of the stored value.
 
 7. Can "mat" check a literal directly?
     No. The value after `mat` must be a variable or a supported expression.
@@ -46,8 +52,8 @@ What is the "mat" statement?
     Yes.
 
 10. Can the value checked by "mat" be the result of another function?
-    The checked value can be a supported expression. Dot calls are limited
-    to the built-in `.string()` and `.type()` operations.
+    Yes, if the expression is accepted by the expression grammar and produces
+    a value whose type the interpreter can determine.
 
 11. What can be used as a case value?
     Cases use fixed values. Supported case values are:
@@ -144,7 +150,7 @@ What is the "mat" statement?
 
 39. What happens if an error occurs while the matching case is running?
     The case stops running and the error is passed back to the surrounding
-    execution.
+    execution with `MatchCaseExecutionError` appended.
 
 40. Does the matching case stop after one statement?
     No. It runs every statement in the matching branch, unless execution

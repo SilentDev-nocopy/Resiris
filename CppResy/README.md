@@ -1,7 +1,7 @@
 # Resiris C++ port
 
-C++17 port of the Python prototype in `../PyResy`. Behaviour is identical: error
-messages, float formatting and the token/AST dump match byte for byte.
+C++17 port of the Python prototype in `../PyResy`. The differential test script
+compares the output of its fixture programs with the Python implementation.
 
 All commands below run from this directory (`CppResy/`).
 
@@ -50,13 +50,15 @@ twice. After `--purge` you have to build again from scratch.
 ./build/resiris examples/04_timer_lifecycle.resy   # RSBase timer, Ctrl+C to stop
 ```
 
-Also: `--version`, `--help`, `--enable-frontend-visibility` (adds `<TOKENS>` and
-`<AST>` output).
+Also: `--version`, `--help`, `--enable-frontend-visibility`, and
+`--disable-frontend-visibility`. Frontend visibility adds `<TOKENS>` and `<AST>`
+output after a program completes normally; its setting is stored in
+`~/.config/resiris/frontend_visibility`.
 
 ## Test
 
 ```sh
-./build/resiris-tests                  # 114 Catch2 cases
+./build/resiris-tests                  # currently 140 Catch2 cases
 ./tools/differential_test.sh           # 29 programs, compared with the prototype
 python3 tools/audit_sweep.py           # 589 programs taken from the Python test suite
 ```
@@ -83,18 +85,38 @@ diff /tmp/py.txt /tmp/cpp.txt && echo identical
 | Path | Contents |
 | --- | --- |
 | `include/resiris/`, `src/` | tokenizer, parser, interpreter, CLI |
-| `include/resiris/modules/`, `src/modules/` | built-in modules |
+| `include/resiris/modules/`, `src/modules/` | built-in module interfaces and implementations |
 | `examples/` | runnable example programs |
-| `tests/` | Catch2 suite and the differential fixtures |
+| `tests/` | Catch2 suite and Resiris differential fixtures |
+| `txt/info/` | language, module, type, timer and hardware references |
+| `txt/ideas/` | design notes; not authoritative API documentation |
 | `tools/` | `differential_test.sh`, `audit_sweep.py`, `uninstall.sh` |
 | `third_party/catch.hpp` | Catch2 2.13.10 |
 
 ## Notes
 
 - `int` is `int64_t`, not Python's arbitrary-precision integer.
-- Modules are compiled in, not loaded from files at runtime, so
-  the `<include>` directive only works in the Python prototype. This is the
-  intended direction for the embedded target.
-- Adding a module: implement the five methods of `Module`
-  (`include/resiris/module.hpp`), add the source to `CMakeLists.txt`, and add
-  one line to the registration list in `src/cli.cpp`.
+- The CLI registers `RSMath`, `RSBase`, `RSConvert`, and `RSSignal` as compiled-in
+  modules. `<include>` selects one of these registered modules; it does not load
+  code dynamically.
+- The desktop `RSSignal` module is a simulation, not an ESP32 hardware driver.
+- Adding a module: implement the six pure virtual methods of `Module`
+  (`include/resiris/module.hpp`), add its source to `CMakeLists.txt`, include
+  its header, and register it in `src/cli.cpp`.
+- The ESP32 component list in `txt/info/hardware_components.txt` is a plan, not
+  a record of assembled or integrated hardware.
+
+## Documentation
+
+| File | Scope |
+|---|---|
+| `txt/info/language_reference.txt` | Current syntax, types and execution model |
+| `txt/info/type_operations.txt` | `.type()`, `.string()` and `str()` behavior |
+| `txt/info/match_statement.txt` | Current `mat` grammar and behavior |
+| `txt/info/native_module_system.txt` | Module inclusion, registry and C++ interface |
+| `txt/info/rsmath_module.txt` | `RSMath` API |
+| `txt/info/rsbase_timer_module.txt` | `RSBase` timer API and frame-clock semantics |
+| `txt/info/rsconvert_module.txt` | `RSConvert` API and validation rules |
+| `txt/info/rssignal_module.txt` | `RSSignal` desktop simulation and GPIO constants |
+| `txt/info/esp32_gpio_table.txt` | ESP32-WROOM-32 pin reference; not the desktop simulator behavior |
+| `txt/info/hardware_components.txt` | Proposed calculator hardware, not implemented product features |

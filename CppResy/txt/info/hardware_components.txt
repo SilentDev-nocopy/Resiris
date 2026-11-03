@@ -6,21 +6,31 @@ Custom Calculator – Components
 
 The goal is a custom, programmable scientific calculator, mainly for school and home use.
 
+STATUS: CONCEPT AND PROCUREMENT PLAN
+
+This is a list of proposed components, not confirmation that they have been
+purchased, assembled, or integrated. Check the exact product variant, current
+availability, and electrical specifications before purchase or wiring.
+
 1. ESP32-WROOM-32
 
-CPU: Dual-Core Xtensa LX6
-Clock speed: max. 240 MHz
-RAM: approx. 520 KB SRAM
-Flash: typically 4 MB
+CPU: Xtensa LX6; the classic ESP32-WROOM-32 is dual-core and can run
+     up to 240 MHz. Confirm the selected board variant.
+RAM: approximately 520 KB internal SRAM on the chip; less is available
+     to the application as heap.
+Flash: board-dependent; 4 MB is common, not guaranteed by the module name.
 Wi-Fi: 2.4 GHz
 Bluetooth: Classic + BLE
-GPIO: 34
+GPIO: 34 GPIO-capable signals are associated with the ESP32 chip; the
+      WROOM-32 module exposes a subset. See `esp32_gpio_table.txt` for
+      the project's selected 26-pin map and limitations.
 ADC: 12-bit
 Communication: UART, SPI, I²C
 Power: 3.3 V for the chip
 Development board: programmable via USB
 
-This will be the brain of the calculator. It handles the buttons, the display, the calculations, and the custom programs.
+Planned controller. No keyboard matrix, display driver, battery manager, or
+custom program storage is documented here as implemented.
 
 2. OLED Display
 
@@ -34,7 +44,8 @@ Power: 3.3–5 V
 Touch: none
 Dimensions: approx. 71 × 43.5 mm
 
-In the project it will likely communicate with the ESP32 via an I²C connection.
+The interface must be confirmed for the selected display variant; I2C is a
+candidate, not an implemented connection.
 
 3. Keyboard
 
@@ -43,16 +54,18 @@ Legs: 4
 Design: Through-Hole (THT)
 Size: 12 × 12 mm variants
 Kit: 250 pcs, various sizes/heights
-Planned number of buttons: approx. 40–50 pcs
+Planned number of buttons: approximately 40–50; not yet wired or validated
 Wiring: button matrix
 
 The buttons will provide access to basic operations and scientific functions, such as sin, cos, tan, log, ln, square root, power, parentheses, etc.
 
 4. Communication and Data Transfer
 
-PC ↔ calculator: The ESP32 development board connects to the computer via USB. This will be used to upload firmware, debug, and later build a custom data transfer system.
+PC <-> calculator: USB is intended for firmware upload and debugging. A
+custom calculator data-transfer protocol is a future idea, not implemented.
 
-Transferring programs: We can create our own program format for the calculator. From the PC program, custom programs can be sent to the calculator via USB, which can then be stored in the ESP32's Flash memory.
+Transferring programs: A custom program format, USB transfer tool, and
+persistent user-program storage have not been implemented.
 
 Possible system:
 PC → USB → ESP32 → Flash memory
@@ -68,9 +81,13 @@ ESP32 and keyboard: via GPIOs, using matrix wiring.
 
 Firmware: C/C++
 Development: VS Code + PlatformIO
-The firmware's task: computation engine, keyboard, OLED, memory, menu system, and program management.
+Planned firmware responsibilities: computation engine, keyboard, display,
+memory, menu system, and program management. These integrations are not
+implemented in this CppResy desktop CLI.
 
-Later, we can also create our own simple programming language/interpreter, so separate programs can be written for the calculator.
+The Resiris C++ interpreter exists as a desktop CLI in this repository.
+Calculator firmware integration, display UI, and persistent user-program
+management are not implemented by this component plan.
 
 6. Power Supply
 
@@ -83,7 +100,7 @@ Jumper/Dupont wires – for wiring
 PCB – only after the working prototype
 Case – later, likely a custom/3D-printed design
 
-Current Main Components
+Planned Main Components (purchase and integration unverified)
 
 ESP32-WROOM-32
 2.42" 128×64 SSD1309 monochrome OLED

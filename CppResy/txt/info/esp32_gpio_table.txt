@@ -12,10 +12,16 @@ Fontos:
     A fejleszto panel pontos kiosztasa panelenkent elterhet; bekotes elott
     ellenorizd a panel feliratait es kapcsolasi rajzat.
 
+    Ez hardveres referencia, nem a CppResy asztali RSSignal moduljanak
+    leirasa. A desktop CLI csak memoriaban szimulalja a GPIO-allapotot;
+    fizikai labakat nem olvas es nem vezerel. Lasd: rssignal_module.txt.
+
     A GPIO szamok a chip logikai pinjei. Nem azonosak a panel fizikai
     csatlakozohelyeinek sorszamaival.
 
-    Az ESP32-WROOM-32 modul 26 altalanos celra kivezetett GPIO-t ad.
+    A tabla az ESP32-WROOM-32 modul 26, a projektben hasznalt es
+    altalanos celra kivezetett GPIO-jat tartalmazza; nem minden GPIO-szam
+    letezik vagy erheto el a modulon.
     A GPIO6-GPIO11 a modul flashmemoriajahoz kapcsolodik, a GPIO37 es
     GPIO38 pedig nem hozzaferheto a modulon. Ezeket ne vedd fel a program
     szabadon hasznalhato GPIO-listajaba.
