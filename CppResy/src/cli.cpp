@@ -13,7 +13,9 @@
 #include "resiris/interpreter.hpp"
 #include "resiris/parser.hpp"
 #include "resiris/modules/rsbase.hpp"
+#include "resiris/modules/rsconvert.hpp"
 #include "resiris/modules/rsmath.hpp"
+#include "resiris/modules/rssignal.hpp"
 #include "resiris/syntax_error.hpp"
 #include "resiris/tokenizer.hpp"
 #include "resiris/version.hpp"
@@ -399,6 +401,8 @@ int run_file(const std::string& source_path, bool show_frontend) {
         auto registry = std::make_shared<ModuleRegistry>(std::vector<std::shared_ptr<Module>>{
             std::make_shared<RsMathModule>(),
             std::make_shared<RsBaseModule>(),
+            std::make_shared<RsConvertModule>(),
+            std::make_shared<RsSignalModule>(),
         });
 
         Interpreter interpreter(registry);

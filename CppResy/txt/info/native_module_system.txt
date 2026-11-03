@@ -9,6 +9,8 @@ What is a Resiris module?
 Current CppResy modules:
     RSMath
     RSBase
+    RSConvert
+    RSSignal
 
 The modules are compiled into the application. CppResy does not load module
 files dynamically from a Modules folder.

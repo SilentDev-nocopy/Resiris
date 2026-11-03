@@ -275,7 +275,7 @@ See `native_module_system.txt` for more information.
 - Continuous execution uses PROCESS(FPS).
 - Modules are registered by the C++ application. They are not loaded
   dynamically from a Modules folder.
-- The current CppResy CLI registers RSMath and RSBase.
+- The current CppResy CLI registers RSMath, RSBase, RSConvert, and RSSignal.
 - int uses a signed 64-bit value.
 
 These descriptions follow the current CppResy implementation. A feature

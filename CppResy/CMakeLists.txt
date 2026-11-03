@@ -16,6 +16,8 @@ add_library(resiris
   src/interpreter.cpp
   src/modules/rsmath.cpp
   src/modules/rsbase.cpp
+  src/modules/rsconvert.cpp
+  src/modules/rssignal.cpp
 )
 target_include_directories(resiris PUBLIC include)
 target_compile_options(resiris PRIVATE -Wall -Wextra)
@@ -46,6 +48,8 @@ add_executable(resiris-tests
   tests/test_control_flow.cpp
   tests/test_modules.cpp
   tests/test_rsbase.cpp
+  tests/test_rsconvert.cpp
+  tests/test_rssignal.cpp
 )
 target_link_libraries(resiris-tests PRIVATE resiris)
 target_include_directories(resiris-tests PRIVATE third_party)
