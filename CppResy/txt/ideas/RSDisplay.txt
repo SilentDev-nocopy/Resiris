@@ -1,0 +1,85 @@
+
+functions: 
+- create_display() ##firstly we have to create it.
+- clear_display() ##clears the whole screen. basicly resets it.
+
+- add_cursor_content(letter : string) ##adds the given letter to the cursor content.
+##its short call neme is "ACC()"
+
+- remove_cursor_content()
+##its short call name is "RCC()"
+
+- add_and_print_cursor_content(letter : string) ##the given letter is printed, if multicalled its prints the letters next to each other. Only acceps one letter at a time!
+##its short call neme is "AAPCC()"
+
+- remove_and_print_cursor_content()
+##its short call name is "RAPCC()"
+
+- refresh_display() ##re-draws everything. Mostly used in PROCESS(FPS)
+
+- get_cursor_pos() ##on start ist 0 . As the letter or a number is added, it moves right with an int value of 1.
+
+- get_cursor_content() ##gives back the whole cursor_content
+
+- move_cursor(int) ##moves the cursor from its current position to right, with the given int times.
+##WARNING! If the value is more then the typed in text, then it goose as far at the text goes.
+
+-jump_cursor(int) ##instantly moved the cursor to the given value. 
+##WARNING! If the value is more then the typed in text, then its jumpos to the end. Same with negative int value! It jumps to the start!
+
+-
+
+-
+
+
+
+What is the difference between ACC() and AAPCC(), and when does each change become visible on the display?
+    ACC() just adds to the cursor content, but the AAPCC() also prints it out but int only visible after the refresh_display() has run.
+
+What should happen to the visible display after ACC() changes the cursor content?
+    ACC() changes the cursor content. The change becomes visible after refresh_display() runs.
+
+Should AAPCC() update the visible display immediately, or only change the content until refresh_display() is called?
+    AAPCC() also prints the content, but it only becomes visible after refresh_display() has run.
+
+What exactly does "prints it out" mean for AAPCC() and RAPCC(): do they update a display buffer, or do they draw directly to the hardware?
+    They change what is printed on the display; the change is only visible after refresh_display() runs.
+
+What should RCC() remove: the character before the cursor, the character after it, or something else?
+    RCC() and RAPCC() are both Backspace functions. RCC() removes the letter at the cursor position. RAPCC() changes the printed cursor content.
+
+Does RCC() remove the character before the cursor, like Backspace? In the example, should `12|3` become `1|3`?
+    RCC() removes the letter at the cursor position.
+
+What is the difference between RCC() and RAPCC() if both remove a character? Does RAPCC() also update the display buffer?
+    RCC() removes the letter at the cursor position. RAPCC() changes the printed cursor content.
+
+What should happen when the cursor is moved beyond the beginning or end of the content?
+    It stays at the end or the beginning.
+
+Should create_display() initialize the hardware, or should initialization require a separate call?
+
+What does `display.new()` do after `RSDisplay.create_display()`? Is it required to initialize the display, or can it be removed?
+
+Should ACC() and AAPCC() accept exactly one character, or any string?
+
+What should the display show when the cursor is between two characters?
+
+What could editing the input look like in a program?
+    <include> RSDisplay
+
+    v display ModuleObject = RSDisplay.create_display()
+    c FPS int = 10
+    START():
+        display.new()
+        display.AAPCC("1") ##display_output: 1!  The ! represents the cursor, making its position easier to see. WE NOT GONNA USE IT LIKE THAT!
+        display.AAPCC("2") ##display_output: 12!
+        display.AAPCC("3") ##display_output: 123!
+        display.move_cursor(-1) ##display_output: 12!3
+        display.RCC() ##display_output: 1!3
+        display.ACC("2")
+        print_cmd(display.get_cursor_content) ##cmd output: 123
+        print_cmd(display.get_cursor_pos) ##cmd output: 2
+
+PROCESS(FPS)
+    display.refresh_display()

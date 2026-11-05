@@ -7,8 +7,7 @@ simulation; it does not connect to an ESP32. Consult
 `../info/esp32_gpio_table.txt` for the separate WROOM-32 hardware reference.
 This file preserves the original hardware-module design idea.
 
-Name: RSSignal@ESP32-WROOM-32 ## The "@" is required because it specifies which ESP this module works with.
-
+Name: RSSignal
 The Resiris module which provides the GPIOs usage. Sending and receiving data from them.
 
 functions:
