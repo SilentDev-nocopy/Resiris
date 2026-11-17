@@ -83,7 +83,7 @@ Firmware: C/C++
 Development: VS Code + PlatformIO
 Planned firmware responsibilities: computation engine, keyboard, display,
 memory, menu system, and program management. These integrations are not
-implemented in this CppResy desktop CLI.
+implemented in this Resiris desktop CLI.
 
 The Resiris C++ interpreter exists as a desktop CLI in this repository.
 Calculator firmware integration, display UI, and persistent user-program

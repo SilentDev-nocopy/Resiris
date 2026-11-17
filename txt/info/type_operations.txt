@@ -18,7 +18,7 @@ What is the ".type()" operation?
         int
 
 2. Which types can be checked with ".type()"?
-    The current CppResy implementation can return:
+    The current Resiris implementation can return:
     - int
     - float
     - string
@@ -55,7 +55,7 @@ What is the ".type()" operation?
         10 -> 10.0
 
 6. How does float -> int work?
-    CppResy currently converts `(value + 0.5)` to an integer, truncating
+    Resiris currently converts `(value + 0.5)` to an integer, truncating
     toward zero as part of the C++ integer conversion.
 
     Examples:
@@ -151,4 +151,4 @@ str(value):
 - Type checking returns a string, not a type object.
 - An UnknownObject containing a scalar or ModuleObject has a determinable
   runtime type. FunctionalObject does not.
-- The conversion rules above describe the current CppResy implementation.
+- The conversion rules above describe the current Resiris implementation.

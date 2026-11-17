@@ -6,13 +6,13 @@ What is a Resiris module?
     A module is a native C++ component that can be used from a Resiris
     program. It provides functions, constants or objects.
 
-Current CppResy modules:
+Current Resiris modules:
     RSMath
     RSBase
     RSConvert
     RSSignal
 
-The modules are compiled into the application. CppResy does not load module
+The modules are compiled into the application. Resiris does not load module
 files dynamically from a Modules folder.
 
 The CLI is a desktop program. In this build RSSignal is a stateful simulation;
@@ -157,7 +157,7 @@ type declared by `variables()`.
 ## 7. Adding a new C++ module
 ########################################################################
 
-To add a module to CppResy:
+To add a module to Resiris:
 
 1. Implement the `Module` interface.
 2. Add the source file to `CMakeLists.txt`.

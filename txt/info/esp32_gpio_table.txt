@@ -12,7 +12,7 @@ Fontos:
     A fejleszto panel pontos kiosztasa panelenkent elterhet; bekotes elott
     ellenorizd a panel feliratait es kapcsolasi rajzat.
 
-    Ez hardveres referencia, nem a CppResy asztali RSSignal moduljanak
+    Ez hardveres referencia, nem a Resiris asztali RSSignal moduljanak
     leirasa. A desktop CLI csak memoriaban szimulalja a GPIO-allapotot;
     fizikai labakat nem olvas es nem vezerel. Lasd: rssignal_module.txt.
 

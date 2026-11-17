@@ -1,4 +1,4 @@
-RSMath module - current CppResy CLI
+RSMath module - current Resiris CLI
 ==================================
 
 RSMath is compiled into the CLI and works on the desktop without hardware.

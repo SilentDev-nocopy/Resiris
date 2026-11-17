@@ -175,7 +175,7 @@ What is the "mat" statement?
 ###################################################
 # Implementation notes
 
-This description follows the current CppResy parser/interpreter.
+This description follows the current Resiris parser/interpreter.
 
 - The checked expression is evaluated once.
 - Case values must be fixed literals.
@@ -184,5 +184,5 @@ This description follows the current CppResy parser/interpreter.
 - Nested mat statements are not supported.
 - There is no fall-through between cases.
 
-Do not treat older ideas or features that are not implemented in CppResy
+Do not treat older ideas or features that are not implemented in Resiris
 as part of the current mat behaviour.

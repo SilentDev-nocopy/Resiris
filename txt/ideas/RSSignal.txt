@@ -1,7 +1,7 @@
 HISTORICAL DESIGN NOTES - NOT THE CURRENT BACKEND DESCRIPTION
 ============================================================
 
-The current CppResy CLI implements RSSignal as an in-memory desktop
+The current Resiris CLI implements RSSignal as an in-memory desktop
 simulation; it does not connect to an ESP32. Consult
 `../info/rssignal_module.txt` for the implemented behavior and
 `../info/esp32_gpio_table.txt` for the separate WROOM-32 hardware reference.

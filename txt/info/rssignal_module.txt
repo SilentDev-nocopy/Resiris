@@ -1,7 +1,7 @@
-RSSignal module - current CppResy CLI
+RSSignal module - current Resiris CLI
 =====================================
 
-The CppResy CLI is a desktop program. Its RSSignal module is a deterministic
+The Resiris CLI is a desktop program. Its RSSignal module is a deterministic
 in-memory simulation, not an ESP32 hardware driver. Include it with
 `<include> RSSignal`.
 

@@ -1,4 +1,4 @@
-RSConvert module - current CppResy CLI
+RSConvert module - current Resiris CLI
 ======================================
 
 RSConvert is compiled into the CLI and runs on the desktop. It is stateless,

@@ -3,7 +3,7 @@
 ########################################################################
 
 RSBase:
-    A native C++ module registered by the CppResy CLI.
+    A native C++ module registered by the Resiris CLI.
     It provides timer objects driven by the interpreter's PROCESS frame clock.
 
 Include:
