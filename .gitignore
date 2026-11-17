@@ -1,29 +1,3 @@
-# Python cache
-__pycache__/
-*.py[cod]
-*$py.class
-
-# Virtual environments
-.venv/
-venv/
-env/
-
-# Python tooling
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-
-# Zed stuff
-.zed/
-
-# Build / packaging
 build/
-dist/
-*.egg-info/
-
-# VS Code
-.vscode/
-
-# OS files
-.DS_Store
-Thumbs.db
+*.o
+*.a

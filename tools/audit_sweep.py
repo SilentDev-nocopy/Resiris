@@ -6,6 +6,8 @@ This turns the ~480 not-yet-ported Python tests into a behavioural sweep
 without having to port the assertions by hand.
 
 Usage: tools/audit_sweep.py [test_file.py ...]
+
+Set RESIRIS_PROTOTYPE_DIR if the prototype is not at ../PyResy.
 """
 from __future__ import annotations
 
@@ -16,7 +18,8 @@ import sys
 import tempfile
 from pathlib import Path
 
-PROTOTYPE = Path(__file__).resolve().parents[2] / "PyResy"
+DEFAULT_PROTOTYPE = Path(__file__).resolve().parents[2] / "PyResy"
+PROTOTYPE = Path(os.environ.get("RESIRIS_PROTOTYPE_DIR", DEFAULT_PROTOTYPE)).resolve()
 CPP_CLI = Path(__file__).resolve().parents[1] / "build" / "resiris"
 HELPERS = {
     "value", "run", "run_error", "error", "output", "prints",
@@ -99,6 +102,11 @@ def run_both(program: str) -> tuple[bool, str]:
 
 
 def main() -> int:
+    if not (PROTOTYPE / "resiris" / "cli.py").is_file():
+        print(f"missing Python prototype at {PROTOTYPE}; set RESIRIS_PROTOTYPE_DIR to a PyResy checkout",
+              file=sys.stderr)
+        return 2
+
     if len(sys.argv) > 1:
         files = [Path(name) for name in sys.argv[1:]]
     else:

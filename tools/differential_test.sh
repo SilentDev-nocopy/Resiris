@@ -4,12 +4,13 @@
 #
 # Usage: tools/differential_test.sh [fixture.resy ...]
 # Without arguments every tests/differential/*.resy file is used.
+# RESIRIS_PROTOTYPE_DIR overrides the default ../PyResy prototype location.
 
 set -uo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 project_dir="$(dirname "$script_dir")"
-prototype_dir="$(dirname "$project_dir")/PyResy"
+prototype_dir="${RESIRIS_PROTOTYPE_DIR:-$(dirname "$project_dir")/PyResy}"
 cpp_cli="$project_dir/build/resiris"
 fixture_dir="$project_dir/tests/differential"
 work_dir="$(mktemp -d)"
@@ -17,6 +18,11 @@ trap 'rm -rf "$work_dir"' EXIT
 
 if [ ! -x "$cpp_cli" ]; then
     echo "missing $cpp_cli - build first: cmake --build build" >&2
+    exit 2
+fi
+
+if [ ! -f "$prototype_dir/resiris/cli.py" ]; then
+    echo "missing Python prototype at $prototype_dir - set RESIRIS_PROTOTYPE_DIR to a PyResy checkout" >&2
     exit 2
 fi
 
