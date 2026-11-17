@@ -1,6 +1,0 @@
-
-
-c FPS float = 60
-
-PROCESS(FPS):
-	print_cmd(FPS)
