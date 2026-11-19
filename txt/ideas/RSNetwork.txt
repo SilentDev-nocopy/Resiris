@@ -1,0 +1,6 @@
+its purpose and usage is to make servers or webpages served localy.
+For start it runs only html. No java or css
+functions:
+    create_server(port_number as int)
+    set_page_contect(html file, or its variant_name)
+    start_server()
