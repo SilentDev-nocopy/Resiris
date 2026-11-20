@@ -1,6 +1,36 @@
-its purpose and usage is to make servers or webpages served localy.
-For start it runs only html. No java or css
-functions:
-    create_server(port_number as int)
-    set_page_contect(html file, or its variant_name)
-    start_server()
+its purpose and usage is to make servers or webpages served localy and also access the web and using the wifi. 
+
+
+
+
+
+hosting a website/server:
+
+    The main goal is for the hosting hardware to have as little work to do as possible! That why we dont use java or css on the hosting side! Lets give the client every hard computing!
+    It runs only html. No java or css! The client can use java and css and the others.
+
+
+    functions:
+        html_server_handler() -> main function for the usage of html servers. Without it, the server cant exist beacuse itt will miss the handler! Give error "Missing Server Handler!" if missing!
+        create_server(port_number as int) -> creates the server by its handler.
+        set_page_content(html file or its variant_name) -> sets the server front page html file. 
+        start_server() -> starts the server so it can be accessed by entering the hardware's IP address in a browser. If create_server() has not been called, display: "Error: Server not initialized. Call create_server(port_number) before start_server()."
+        process() -> needed to process the server interactions and other "just-in-time" processes.
+        request()
+        respond()
+
+    Usage:
+    <include> RSNetwork
+
+    c FPS float = 10.0
+    v page ModuleObject = RSNetwork.html_server_handler()
+    c port_number int = 8080
+    v html_page_content string = "<!DOCTYPE html> <html><head><title>My Page</title></head><body><h1>Hello World!</h1></body></html>"
+
+    START():
+        page.create_server(port_number)
+        page.set_page_content(html_page_content)
+        page.start_server()
+        
+    PROCESS(FPS):
+        page.process()
