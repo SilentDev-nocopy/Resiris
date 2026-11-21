@@ -1,36 +1,153 @@
+include command: <include> RSNetwork
+
 its purpose and usage is to make servers or webpages served localy and also access the web and using the wifi. 
 
+	functions:
+		RSNetwork.wifi() -> main function for every wifi orianted script.
+		RSNetwork.wifi().get_all_networks() -> gives back every wifi port name as string.
 
+		
+		
 
 
 
 hosting a website/server:
 
-    The main goal is for the hosting hardware to have as little work to do as possible! That why we dont use java or css on the hosting side! Lets give the client every hard computing!
-    It runs only html. No java or css! The client can use java and css and the others.
+	The main goal is for the hosting hardware to have as little work to do as possible! That why we dont use java or css on the hosting side! Lets give the client every hard computing!
+	It runs only html. No java or css! The client can use java and css and the others.
 
 
-    functions:
-        html_server_handler() -> main function for the usage of html servers. Without it, the server cant exist beacuse itt will miss the handler! Give error "Missing Server Handler!" if missing!
-        create_server(port_number as int) -> creates the server by its handler.
-        set_page_content(html file or its variant_name) -> sets the server front page html file. 
-        start_server() -> starts the server so it can be accessed by entering the hardware's IP address in a browser. If create_server() has not been called, display: "Error: Server not initialized. Call create_server(port_number) before start_server()."
-        process() -> needed to process the server interactions and other "just-in-time" processes.
-        request()
-        respond()
+	functions:
+		html_server_handler() -> main function for the usage of html servers. Without it, the server cant exist beacuse itt will miss the handler!
+		create_server(port_number as int) -> creates the server by its handler.
+		set_page_content(file_path or a string type variable) -> sets the server front page html file. #file path is currently not avaible! maybe in later version!
+		start_server() -> starts the server so it can be accessed by entering the hardware's IP address in a browser. If create_server() has not been called, display: "Error: Server not initialized. Call create_server(port_number) before start_server()."
+		process() -> accepts one new request and sends the buffered response on the next call.
+		
+		request_string_data()
+			Returns the most recent string data received since the last process() call.
+			Repeated calls return the same most recent data until a new request arrives.
+			Throws "RSNetwork.request_string_data: no most recent string data" if none.
 
-    Usage:
-    <include> RSNetwork
+		request_int_data()
+			Returns the most recent int data received since the last process() call.
+			Repeated calls return the same most recent data until a new request arrives.
+			Throws "RSNetwork.request_int_data: no most recent int data" if none.
 
-    c FPS float = 10.0
-    v page ModuleObject = RSNetwork.html_server_handler()
-    c port_number int = 8080
-    v html_page_content string = "<!DOCTYPE html> <html><head><title>My Page</title></head><body><h1>Hello World!</h1></body></html>"
+		request_float_data()
+			Returns the most recent float data received since the last process() call.
+			Repeated calls return the same most recent data until a new request arrives.
+			Throws "RSNetwork.request_float_data: no most recent float data" if none.
 
-    START():
-        page.create_server(port_number)
-        page.set_page_content(html_page_content)
-        page.start_server()
-        
-    PROCESS(FPS):
-        page.process()
+		request_boolean_data()
+			Returns the most recent bool data received since the last process() call.
+			Repeated calls return the same most recent data until a new request arrives.
+			Throws "RSNetwork.request_boolean_data: no most recent bool data" if none.
+
+		get_request_state()
+			True only while the most recent data is unread.
+
+		respond_string_data(value string)
+			Buffers a string response for the most recent request; the next process() call sends it.
+			A later respond overwrites the buffered response.
+
+		respond_int_data(value int)
+			Buffers an int response for the most recent request; the next process() call sends it.
+			A later respond overwrites the buffered response.
+
+		respond_float_data(value float)
+			Buffers a float response for the most recent request; the next process() call sends it.
+			A later respond overwrites the buffered response.
+
+		respond_boolean_data(value bool)
+			Buffers a bool response for the most recent request; the next process() call sends it.
+			A later respond overwrites the buffered response.
+
+		##Each function throws an error if no request is currently awaiting a response.
+
+	open questions:
+		- What URL should the browser call? For example: /call/add/2/3, /call/add?a=2&b=3, or a JSON body?
+			Browser requests use URL query parameters, for example /call/add?value=5. Only the most recent data from the most recent request is kept.
+		- Can the server keep several requests waiting?
+			only one at a time.
+		- If the browser sends 2 and 3, do two request_int_data() calls return 2 then 3, or does each getter read a different typed field of the same request?
+			The most recent data wins. Repeated calls to the same request function still return that most recent data.
+		- What text should the browser receive for each response type? For example: true -> "true", 5 -> "5", 1.5 -> "1.5".
+			true -> "true", 5 -> "5", 1.5 -> "1.5"
+		- If respond_*_data() is called twice for one request, is the first answer kept, the last answer sent, or is it an error?
+			always the most recent.
+		- Should get_request_state() be true only while data is unread, or also after the data is read but before respond() is called?
+			only while the most recent data is unread. After it is read, the response is sent on the next frame.
+
+	client script:
+
+		The host serves the same fixed script on every page. The page only declares which button calls which name.
+
+		HTML in the page:
+
+			<input id="num" value="5">
+
+			<button rs-call="add" rs-value-from="#num" rs-target="#out">
+				Send
+			</button>
+
+			<output id="out">...</output>
+
+			<script src="/rsclient.js"></script>
+
+		rsclient.js:
+
+			(() => {
+				function readValue(el) {
+					const from = el.getAttribute("rs-value-from");
+					if (from) {
+						const source = document.querySelector(from);
+						return source ? source.value : "";
+					}
+					return el.getAttribute("rs-value") || "";
+				}
+
+				async function callElement(el) {
+					const name = el.getAttribute("rs-call");
+					const targetSelector = el.getAttribute("rs-target");
+					const target = targetSelector ? document.querySelector(targetSelector) : null;
+
+					if (!name) return;
+
+					const value = readValue(el);
+					const url = "/call/" + encodeURIComponent(name) +
+						"?value=" + encodeURIComponent(value);
+
+					try {
+						const response = await fetch(url);
+						const text = await response.text();
+						if (target) target.textContent = text;
+					} catch (error) {
+						if (target) target.textContent = "Error: " + error.message;
+					}
+				}
+
+				document.querySelectorAll("[rs-call]").forEach(el => {
+					el.addEventListener("click", () => callElement(el));
+				});
+			})();
+
+	Usage:
+	<include> RSNetwork
+
+	c FPS float = 10.0
+	v page ModuleObject = RSNetwork.html_server_handler()
+	c port_number int = 8080
+	v html_page_content string = "<!DOCTYPE html> <html><head><title>My Page</title></head><body><h1>Hello World!</h1></body></html>"
+
+	START():
+		page.create_server(port_number)
+		page.set_page_content(html_page_content)
+		page.start_server()
+		
+	PROCESS(FPS):
+		page.process()
+		if page.get_request_state():
+			v data_from_page int = page.request_int_data()
+			page.respond_string_data("ok")
+			
