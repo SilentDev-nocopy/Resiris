@@ -10,11 +10,12 @@ Current modules:
 - `RSBase`
 - `RSConvert`
 - `RSSignal`
+- `RSNetwork`
 
 The modules are **compiled into the application**. Resiris does not load module files dynamically from a `Modules` folder.
 
 > [!NOTE]
-> The CLI is a desktop program. In this build `RSSignal` is a stateful simulation; it does not access physical ESP32 pins or an ADC. See [rssignal_module.md](rssignal_module.md) for its simulated behavior and [esp32_gpio_table.md](esp32_gpio_table.md) for hardware planning information.
+> The CLI is a desktop program. In this build `RSSignal` is a stateful simulation; it does not access physical ESP32 pins or an ADC. See [rssignal_module.md](rssignal_module.md) for its simulated behavior and [esp32_gpio_table.md](esp32_gpio_table.md) for hardware planning information. `RSNetwork`'s Wi-Fi functions throw a `ModuleError` on the CLI; its HTML server works on `127.0.0.1`. See [rsnetwork_module.md](rsnetwork_module.md).
 
 ## 2. Including a module
 

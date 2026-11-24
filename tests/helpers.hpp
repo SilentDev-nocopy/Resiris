@@ -16,6 +16,7 @@
 #include "resiris/modules/rsbase.hpp"
 #include "resiris/modules/rsconvert.hpp"
 #include "resiris/modules/rsmath.hpp"
+#include "resiris/modules/rsnetwork.hpp"
 #include "resiris/modules/rssignal.hpp"
 #include "resiris/syntax_error.hpp"
 #include "resiris/tokenizer.hpp"
@@ -40,6 +41,7 @@ inline std::shared_ptr<resiris::ModuleRegistry> make_registry() {
     modules.push_back(std::make_shared<resiris::RsBaseModule>());
     modules.push_back(std::make_shared<resiris::RsConvertModule>());
     modules.push_back(std::make_shared<resiris::RsSignalModule>());
+    modules.push_back(std::make_shared<resiris::RsNetworkModule>());
     return std::make_shared<resiris::ModuleRegistry>(std::move(modules));
 }
 

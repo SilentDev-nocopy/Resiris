@@ -24,6 +24,10 @@ cmake --build build -j
 
 More programs are in `examples/`; the timer demos run until Ctrl+C. `resiris --help` lists the options, `resiris --version` prints the version, and running without a file prints usage.
 
+## Modules
+
+The CLI registers `RSMath`, `RSBase`, `RSConvert`, `RSSignal`, and `RSNetwork`. `RSNetwork`'s Wi-Fi API is ESP32 only and raises an error in the CLI; its HTML server binds to `127.0.0.1`. See [`txt/info/`](txt/info/) for each module's reference.
+
 ## Install / uninstall
 
 ```sh

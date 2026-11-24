@@ -15,6 +15,7 @@
 #include "resiris/modules/rsbase.hpp"
 #include "resiris/modules/rsconvert.hpp"
 #include "resiris/modules/rsmath.hpp"
+#include "resiris/modules/rsnetwork.hpp"
 #include "resiris/modules/rssignal.hpp"
 #include "resiris/syntax_error.hpp"
 #include "resiris/tokenizer.hpp"
@@ -403,6 +404,7 @@ int run_file(const std::string& source_path, bool show_frontend) {
             std::make_shared<RsBaseModule>(),
             std::make_shared<RsConvertModule>(),
             std::make_shared<RsSignalModule>(),
+            std::make_shared<RsNetworkModule>(),
         });
 
         Interpreter interpreter(registry);
