@@ -6,39 +6,56 @@ Its purpose is to make servers or webpages available locally and to access the w
 network stuff: EspOnly
 
 	constants:
-		ROUTEMODE_CRE = "CRE"   ## CRE = Connect to Existing Router: station mode, ESP joins an existing router
-		ROUTEMODE_SR = "SR"     ## SR = Self Router: access point mode, ESP creates its own network
-		ROUTEMODE_MB = "MB"     ## MB = Man in Between: dual mode, station + access point at the same time
+		ROUTEMODE_CRE string = "CRE"   ## CRE = Connect to Existing Router: station mode, ESP joins an existing router
+		ROUTEMODE_SR string = "SR"     ## SR = Self Router: access point mode, ESP creates its own network
+		ROUTEMODE_MB string = "MB"     ## MB = Man in Between: dual mode, station + access point at the same time
 
 
 	functions:
 		RSNetwork.wifi() -> main function for most of Wi-Fi-related script.
-		RSNetwork.wifi().get_all_networks() -> returns every Wi-Fi network name (SSID) as a string and they seperated with", ". 
-		RSNetwork.wifi().connect(ssid string, password string) -> bool; connects to the given network with the password.
-		RSNetwork.wifi().set_route_mode(mode string) -> bool; mode must be RSNetwork[ROUTEMODE_CRE], RSNetwork[ROUTEMODE_SR] or RSNetwork[ROUTEMODE_MB].
+			get_all_networks() -> returns every Wi-Fi network name (SSID) as a string and they seperated with", ". 
+			connect(ssid string, password string) -> bool; connects to the given network with the password.
+			set_route_mode(mode string) -> bool; mode must be RSNetwork[ROUTEMODE_CRE], RSNetwork[ROUTEMODE_SR] or RSNetwork[ROUTEMODE_MB].
 		Get the handle first: v wifi ModuleObject = RSNetwork.wifi(), then call wifi.connect(...) or wifi.set_route_mode(...).
-		RSNetwork.wifi().get_ip(SSID string) # to get own ip, you have to write the runner devide own ssid.
-		RSNetwork.wifi().get_ssid(ip string) ## for example: "192.162.1.4"
-		RSNetwork.wifi().disconnect() ->disconnect from the currently connected network.
-		RSNetwork.wifi().get_route_mode() -> gives back the current ROUTEMODE.
-		RSNetwork.wifi().set_route_info(ssid string, password string) ->only usable with SR !
-		RSNetwork.wifi().get_own_route_info() -> gives back own route infos. Warning! it could be harmfull so the password is not shown! Just the first and the last character of the password is visible, the others are displayed with "*"! Also it could not be used with other functions! NO return or any methods to give back data! JUST print_cmd!
-		
-		RSNetwork.create_wifi_data_process_handler() -> its a makes a handler. with this you can get any "constanstly changing data" like current network speed and others. Use it in START(). Its a process() function but the process() function is not needed to typed out.
-		RSNetwork.create_wifi_data_process_handler().get_global_speed() -> gives back the currently connected network's global speed witch is calculated from the download and the upload speed. For best use: use it in PROCESS(FPS)
+			get_ip(SSID string) # to get own ip, you have to write the runner devide own ssid. otherwise it returns the called ssid's ip
+			get_ssid(ip string) ## for example: "192.162.1.4"
+			disconnect() -> disconnect from the currently connected network. It gives no value.
+			get_route_mode() -> gives back the current ROUTEMODE.
+			set_route_info(ssid string, password string) ->only usable with SR ! if not used in SR mode, give error:"Use it with SR mode" #or something like that
+			get_own_route_info() -> string; returns the route info with the password masked as X***Y. Call it inside print_cmd() to display it.
+					RSNetwork.create_wifi_data_process_handler() -> its a makes a handler. with this you can get any "constanstly changing data" like current network speed and others. Use it in START(). It contains its own process() function so process() function is not needed to typed out. Also process() is not an actuall RSNetwork function!
+			wifi_data_handler.get_global_speed() -> float; gives back the currently connected network's global speed which is calculated from the download and the upload speed. Call it on the ModuleObject created by RSNetwork.create_wifi_data_process_handler() in START(). For best use: use it in PROCESS(FPS). Only usable after the handler is created, else gives an error!
 
-Usage:
 
-	c FPS int = 10
-	v wifi_proc_handler ModuleObject = RSNetwork.create_wifi_data_process_handler()
-	v wifi_handling ModuleObject = RSNetwork.wifi()
+	Usage:
+		<include> RSNetwork
+
+		c FPS float = 10.0
+		v wifi_handler ModuleObject = RSNetwork.wifi()
+		v wifi_data_handler ModuleObject = RSNetwork.create_wifi_data_process_handler()
 
 		START():
-			wifi_handling.set_route_mode(RSNetwork[SR])
-			
+			## Connect to an existing Wi-Fi network
+			wifi_handler.set_route_mode(RSNetwork[ROUTEMODE_CRE])
+			print_cmd(wifi_handler.get_all_networks())
+
+			v connected bool = wifi_handler.connect("network_name", "password")
+			if connected:
+				print_cmd("Connected to Wi-Fi")
+				print_cmd(wifi_handler.get_route_mode())
+				print_cmd(wifi_handler.get_ip("device_ssid"))
+				print_cmd(wifi_handler.get_ssid("192.168.1.4"))
+			else:
+				print_cmd("Could not connect to Wi-Fi")
+
+			## To use the ESP as an access point, use these instead of the
+			## router connection setup above:
+			## wifi_handler.set_route_mode(RSNetwork[ROUTEMODE_SR])
+			## wifi_handler.set_route_info("network_name", "password")
+			## print_cmd(wifi_handler.get_own_route_info())
 
 		PROCESS(FPS):
-			print_cmd(wifi_proc_handler.get_global_speed())
+			print_cmd(wifi_data_handler.get_global_speed())
 
 
 
