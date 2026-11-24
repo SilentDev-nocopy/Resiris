@@ -1,0 +1,85 @@
+include command: <include> RSMath
+
+Its purpose and usage is to provide scalar math functions and constants.
+
+math stuff: EspAndPc
+
+	constants:
+		PI float = 3.141592653589793   ## pi
+		E float = 2.718281828459045    ## e
+
+		Read them as RSMath[PI] and RSMath[E].
+
+	functions:
+		All functions take the exact number of arguments shown below.
+		Numeric arguments accept int, float, or bool; true is treated as 1 and false as 0.
+		Integer arguments accept int or bool. Invalid signatures raise a module argument error.
+
+		abs(x float) -> absolute value; returns float for a float input, otherwise int.
+		sqrt(x float) -> square root as float. Throws a math-domain error if x is negative.
+		cbrt(x float) -> cube root as float.
+		pow(x float, y float) -> x raised to y, as float.
+		floor(x float) -> greatest integer not greater than x, as int.
+		ceil(x float) -> least integer not less than x, as int.
+		round(x float) -> nearest integer, ties to even, as int.
+		ln(x float) -> natural logarithm as float. Throws a math-domain error if x is not positive.
+		log10(x float) -> base-10 logarithm as float.
+		sin(x float) -> sine as float; the angle is in radians.
+		cos(x float) -> cosine as float; the angle is in radians.
+		tan(x float) -> tangent as float; the angle is in radians.
+		asin(x float) -> inverse sine as float; the result is in radians.
+		acos(x float) -> inverse cosine as float; the result is in radians.
+		atan(x float) -> inverse tangent as float; the result is in radians.
+		atan2(y float, x float) -> angle in radians in the correct quadrant.
+		exp(x float) -> e raised to x, as float.
+		log2(x float) -> base-2 logarithm as float. Throws a math-domain error if x is not positive.
+		radians(degrees float) -> converts degrees to radians, as float.
+		degrees(radians float) -> converts radians to degrees, as float.
+		sign(x float) -> -1, 0, or 1. Throws a math-domain error if x is NaN.
+		square(x float) -> x * x as float.
+		lerp(start float, end float, amount float) -> linear interpolation; amount is not clamped.
+		map_range(value float, input_min float, input_max float, output_min float, output_max float) -> linearly maps one range to another. Throws a math-domain error if the input bounds are equal.
+		smoothstep(edge0 float, edge1 float, x float) -> clamped cubic smooth transition from 0 to 1. Requires edge0 < edge1.
+		hypot(x float, y float) -> hypotenuse sqrt(x*x + y*y), as float.
+		pythagoras(x float, y float) -> alias for hypot(x, y).
+		factorial(n int) -> n! as int. Throws a math-domain error if n is negative.
+		ncr(n int, r int) -> number of combinations as int. Throws a math-domain error if a value is negative; returns 0 if r > n.
+		npr(n int, r int) -> number of permutations as int. Throws a math-domain error if a value is negative; returns 0 if r > n.
+		gcd(a int, b int) -> greatest common divisor as int.
+		lcm(a int, b int) -> least common multiple as int; returns 0 if either input is 0.
+		mod(a float, b float) -> modulo with Python-style divisor-sign behavior; returns int for int inputs, otherwise float. Throws an error if b is 0.
+		min(a float, b float) -> smaller value; returns one of the original arguments.
+		max(a float, b float) -> larger value; returns one of the original arguments.
+		clamp(value float, low float, high float) -> constrains the value to the inclusive bounds and returns one of the input values. Requires low <= high.
+		is_nan(x float) -> bool; true if x is NaN.
+		is_inf(x float) -> bool; true if x is positive or negative infinity.
+		is_finite(x float) -> bool; true if x is neither NaN nor infinite.
+
+		Integer results use Resiris's signed 64-bit int. factorial, ncr, npr and lcm do not check overflow; keep inputs within the range whose result fits in int.
+
+	open questions:
+		- Which functions return int?
+			abs and mod return int when their input is int. floor, ceil, round, factorial, ncr, npr, gcd and lcm always return int. The others return float or bool.
+		- Is the amount in lerp clamped?
+			No.
+		- Does clamp allow low > high?
+			No. It requires low <= high.
+		- Do factorial and combinations check overflow?
+			No. Keep inputs within the range whose result fits in int.
+
+	Usage:
+	<include> RSMath
+
+	print_cmd(RSMath.sqrt(16.0))       ## 4.0
+	print_cmd(RSMath.square(5))        ## 25.0
+	print_cmd(RSMath.pow(2.0, 10.0))   ## 1024.0
+	print_cmd(RSMath.round(2.5))       ## 2
+	print_cmd(RSMath.atan2(1.0, 1.0))  ## 0.785398...
+	print_cmd(RSMath.log2(8.0))        ## 3.0
+	print_cmd(RSMath.degrees(RSMath[PI])) ## 180.0
+	print_cmd(RSMath.lerp(10.0, 20.0, 0.25)) ## 12.5
+	print_cmd(RSMath.map_range(512.0, 0.0, 1023.0, 0.0, 100.0))
+	print_cmd(RSMath.smoothstep(0.0, 1.0, 0.5)) ## 0.5
+	print_cmd(RSMath.ncr(5, 2))         ## 10
+	print_cmd(RSMath.mod(-7, 3))       ## 2
+	print_cmd(RSMath[PI])

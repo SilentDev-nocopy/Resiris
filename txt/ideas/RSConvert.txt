@@ -1,333 +1,235 @@
-HISTORICAL DESIGN NOTES - NOT THE API REFERENCE
-==============================================
+include command: <include> RSConvert
 
-RSConvert is implemented in the current Resiris CLI. This file records the
-original design/rule notes and may contain draft wording; consult
-`../info/rsconvert_module.md` for the current exported API and
-`../../include/resiris/modules/rsconvert.hpp` for the authoritative function
-list. If a design note differs from the implementation, the implementation
-and current API reference take precedence.
+Its purpose and usage is to convert plain text and numeric values into other formats.
 
-Name: RSConvert
+conversion stuff: EspAndPc
 
-This module converts plain text and numeric values into other formats.
+	It only converts values. It does not create ModuleObjects or change anything outside the program.
 
-It only converts values. It does not create ModuleObjects or change anything
-outside the program.
+	Text support:
+		The first version supports ASCII text only. It must report an error if the input contains other characters, including after decoding.
 
-Text support:
-    The first version supports ASCII text only. It must report an error if
-    the input contains other characters, including after decoding.
+	functions:
+		to_base64(text string) -> string; turns ASCII text into Base64.
+		from_base64(text string) -> string; turns Base64 back into ASCII text.
 
-functions:
-    to_base64(text) # Turns ASCII text into Base64.
-    from_base64(text) # Turns Base64 back into ASCII text.
+		text_to_hex(text string) -> string; turns each text character into two lowercase hex digits.
+		hex_to_text(text string) -> string; turns pairs of hex digits back into ASCII text.
 
-    text_to_hex(text) # Turns each text character into two lowercase hex digits.
-    hex_to_text(text) # Turns pairs of hex digits back into ASCII text.
+		integer_to_hex(number int) -> string; turns a whole number into a hex string.
+		hex_to_integer(text string) -> int; turns a hex string into a whole number.
 
-    integer_to_hex(number) # Turns a whole number into a hex string.
-    hex_to_integer(text) # Turns a hex string into a whole number.
+		url_encode(text string) -> string; makes ASCII text safe to use in a URL.
+		url_decode(text string) -> string; turns URL-encoded ASCII text back into text.
 
-    url_encode(text) # Makes ASCII text safe to use in a URL.
-    url_decode(text) # Turns URL-encoded ASCII text back into text.
+		integer_to_binary(number int) -> string; turns a whole number into a binary string.
+		binary_to_integer(text string) -> int; turns a binary string into a whole number.
 
-    integer_to_binary(number) # Turns a whole number into a binary string.
-    binary_to_integer(text) # Turns a binary string into a whole number.
+		integer_to_octal(number int) -> string; turns a whole number into an octal string.
+		octal_to_integer(text string) -> int; turns an octal string into a whole number.
 
-    integer_to_octal(number) # Turns a whole number into an octal string.
-    octal_to_integer(text) # Turns an octal string into a whole number.
+		integer_to_base(number int, base int) -> string; turns a whole number into a string in base 2-36.
+		base_to_integer(text string, base int) -> int; turns a string in base 2-36 into a whole number.
 
-    integer_to_base(number, base) # Turns a whole number into a string in base 2-36.
-    base_to_integer(text, base) # Turns a string in base 2-36 into a whole number.
+		text_to_binary(text string) -> string; turns each ASCII character into eight binary digits.
+		binary_to_text(text string) -> string; turns groups of eight binary digits into ASCII text.
 
-    text_to_binary(text) # Turns each ASCII character into eight binary digits.
-    binary_to_text(text) # Turns groups of eight binary digits into ASCII text.
+		json_escape(text string) -> string; escapes ASCII text for use in a JSON string.
+		json_unescape(text string) -> string; decodes JSON string escapes into ASCII text.
 
-    json_escape(text) # Escapes ASCII text for use in a JSON string.
-    json_unescape(text) # Decodes JSON string escapes into ASCII text.
+		html_escape(text string) -> string; escapes special characters in HTML text.
+		html_unescape(text string) -> string; decodes supported HTML entities.
 
-    html_escape(text) # Escapes special characters in HTML text.
-    html_unescape(text) # Decodes supported HTML entities.
+		csv_escape(text string) -> string; escapes text as one CSV field.
+		csv_unescape(text string) -> string; decodes one CSV field.
 
-    csv_escape(text) # Escapes text as one CSV field.
-    csv_unescape(text) # Decodes one CSV field.
+		url_query_encode(text string) -> string; encodes text using URL query-component rules.
+		url_query_decode(text string) -> string; decodes URL query-component text.
 
-    url_query_encode(text) # Encodes text using URL query-component rules.
-    url_query_decode(text) # Decodes URL query-component text.
+		ascii_to_integer(text string) -> int; gets the ASCII code of one character.
+		integer_to_ascii(number int) -> string; turns an ASCII code into one character.
 
-    ascii_to_integer(text) # Gets the ASCII code of one character.
-    integer_to_ascii(number) # Turns an ASCII code into one character.
+		integer_to_roman(number int) -> string; turns a whole number into Roman numerals.
+		roman_to_integer(text string) -> int; turns Roman numerals into a whole number.
 
-    integer_to_roman(number) # Turns a whole number into Roman numerals.
-    roman_to_integer(text) # Turns Roman numerals into a whole number.
+		rgb_to_hex(red int, green int, blue int) -> string; turns RGB components into a #RRGGBB string.
+		hex_to_red(text string) -> int; gets the red component from a #RRGGBB string.
+		hex_to_green(text string) -> int; gets the green component from a #RRGGBB string.
+		hex_to_blue(text string) -> int; gets the blue component from a #RRGGBB string.
 
-    rgb_to_hex(red, green, blue) # Turns RGB components into a #RRGGBB string.
-    hex_to_red(text) # Gets the red component from a #RRGGBB string.
-    hex_to_green(text) # Gets the green component from a #RRGGBB string.
-    hex_to_blue(text) # Gets the blue component from a #RRGGBB string.
+		seconds_to_duration(seconds int) -> string; formats seconds as HH:MM:SS.
+		duration_to_seconds(text string) -> int; parses an HH:MM:SS duration into seconds.
 
-    seconds_to_duration(seconds) # Formats seconds as HH:MM:SS.
-    duration_to_seconds(text) # Parses an HH:MM:SS duration into seconds.
+		bytes_to_decimal_size(bytes int) -> string; formats bytes using SI units (kB, MB, ...).
+		bytes_to_binary_size(bytes int) -> string; formats bytes using IEC units (KiB, MiB, ...).
+		storage_size_to_bytes(text string) -> int; parses a storage-size string into bytes.
+		bytes_to_bits(bytes int) -> int; converts a byte count into bits.
+		bits_to_bytes(bits int) -> int; converts a bit count into whole bytes.
 
-    bytes_to_decimal_size(bytes) # Formats bytes using SI units (kB, MB, ...).
-    bytes_to_binary_size(bytes) # Formats bytes using IEC units (KiB, MiB, ...).
-    storage_size_to_bytes(text) # Parses a storage-size string into bytes.
-    bytes_to_bits(bytes) # Converts a byte count into bits.
-    bits_to_bytes(bits) # Converts a bit count into whole bytes.
+		integer_to_bytes(number int, byte_count int, byte_order string) -> string; returns bytes as hex text.
+		bytes_to_integer(hex_text string, byte_order string) -> int; parses hex bytes as an integer.
 
-    integer_to_bytes(number, byte_count, byte_order) # Returns bytes as hex text.
-    bytes_to_integer(hex_text, byte_order) # Parses hex bytes as an integer.
+		signed_to_unsigned(number int, bit_width int) -> int; reinterprets a signed bit pattern.
+		unsigned_to_signed(number int, bit_width int) -> int; interprets an unsigned bit pattern.
 
-    signed_to_unsigned(number, bit_width) # Reinterprets a signed bit pattern.
-    unsigned_to_signed(number, bit_width) # Interprets an unsigned bit pattern.
+		float_to_bits(number float, bit_width int) -> string; encodes a float as IEEE 754 bits.
+		bits_to_float(bits string) -> float; decodes an IEEE 754 bit string into a float.
 
-    float_to_bits(number, bit_width) # Encodes a float as IEEE 754 bits.
-    bits_to_float(bits) # Decodes an IEEE 754 bit string into a float.
+		integer_to_gray(number int, bit_width int) -> string; encodes an integer as Gray-code bits.
+		gray_to_integer(bits string) -> int; decodes a Gray-code bit string.
 
-    integer_to_gray(number, bit_width) # Encodes an integer as Gray-code bits.
-    gray_to_integer(bits) # Decodes a Gray-code bit string.
+		integer_to_bcd(number int) -> string; encodes a non-negative integer as BCD bits.
+		bcd_to_integer(bits string) -> int; decodes BCD bits into a non-negative integer.
 
-    integer_to_bcd(number) # Encodes a non-negative integer as BCD bits.
-    bcd_to_integer(bits) # Decodes BCD bits into a non-negative integer.
+		integer_to_leb128(number int) -> string; encodes an integer as unsigned LEB128 hex bytes.
+		leb128_to_integer(hex_bytes string) -> int; decodes unsigned LEB128 hex bytes.
 
-    integer_to_leb128(number) # Encodes an integer as unsigned LEB128 hex bytes.
-    leb128_to_integer(hex_bytes) # Decodes unsigned LEB128 hex bytes.
+		signed_to_zigzag(number int) -> int; maps a signed integer to a non-negative integer.
+		zigzag_to_signed(number int) -> int; maps a ZigZag integer back to a signed integer.
 
-    signed_to_zigzag(number) # Maps a signed integer to a non-negative integer.
-    zigzag_to_signed(number) # Maps a ZigZag integer back to a signed integer.
+		decimal_to_fixed(value float, fractional_bits int) -> int; encodes a value as fixed-point.
+		fixed_to_decimal(number int, fractional_bits int) -> float; decodes a fixed-point integer.
 
-    decimal_to_fixed(value, fractional_bits) # Encodes a value as fixed-point.
-    fixed_to_decimal(number, fractional_bits) # Decodes a fixed-point integer.
+		rgb888_to_rgb565(red int, green int, blue int) -> int; packs 8-bit RGB components into 16 bits.
+		rgb565_to_red(color int) -> int; expands the red component of an RGB565 value.
+		rgb565_to_green(color int) -> int; expands the green component of an RGB565 value.
+		rgb565_to_blue(color int) -> int; expands the blue component of an RGB565 value.
 
-    rgb888_to_rgb565(red, green, blue) # Packs 8-bit RGB components into 16 bits.
-    rgb565_to_red(color) # Expands the red component of an RGB565 value.
-    rgb565_to_green(color) # Expands the green component of an RGB565 value.
-    rgb565_to_blue(color) # Expands the blue component of an RGB565 value.
+		pcm_sample_to_bytes(sample int, bit_width int, byte_order string) -> string; encodes a signed PCM sample.
+		bytes_to_pcm_sample(hex_bytes string, bit_width int, byte_order string) -> int; decodes a signed PCM sample.
 
-    pcm_sample_to_bytes(sample, bit_width, byte_order) # Encodes a signed PCM sample.
-    bytes_to_pcm_sample(hex_bytes, bit_width, byte_order) # Decodes a signed PCM sample.
+		signed_to_offset_binary(sample int, bit_width int) -> int; encodes signed offset-binary data.
+		offset_binary_to_signed(code int, bit_width int) -> int; decodes offset-binary data.
 
-    signed_to_offset_binary(sample, bit_width) # Encodes signed offset-binary data.
-    offset_binary_to_signed(code, bit_width) # Decodes offset-binary data.
+		extract_bit_field(number int, start_bit int, width int) -> int; extracts a bit field.
+		replace_bit_field(number int, start_bit int, width int, value int) -> int; replaces a bit field.
 
-    extract_bit_field(number, start_bit, width) # Extracts a bit field.
-    replace_bit_field(number, start_bit, width, value) # Replaces a bit field.
+		xml_escape(text string) -> string; escapes special characters in XML text.
+		xml_unescape(text string) -> string; decodes supported XML entities.
 
-    xml_escape(text) # Escapes special characters in XML text.
-    xml_unescape(text) # Decodes supported XML entities.
+		newline_normalize(text string) -> string; converts CRLF and CR line endings to LF.
 
-    newline_normalize(text) # Converts CRLF and CR line endings to LF.
+	rules:
+		- Base64 uses the usual Base64 characters and adds `=` at the end when needed.
+		- Text-to-hex uses two lowercase hex digits for each character.
+		- Hex-to-text accepts uppercase or lowercase digits. It reports an error if there is an odd number of digits or any character is not a hex digit.
+		- Integer-to-hex uses lowercase letters and does not add `0x` at the start.
+		- Hex-to-integer accepts uppercase or lowercase letters, with or without `0x` at the start. How negative numbers and numbers that are too large should work still needs to be decided.
+		- URL encoding leaves letters, numbers, `-`, `.`, `_`, and `~` unchanged. It changes other characters into `%` followed by their hex value. A space becomes `%20`, not `+`.
+		- Binary and octal integer strings do not have `0b` or `0o` prefixes. Binary-to-integer accepts only `0` and `1`; octal-to-integer accepts only digits `0` through `7`.
+		- Base conversion accepts bases from 2 through 36. Output uses lowercase letters for digits above 9; input accepts uppercase or lowercase letters. Invalid bases and digits must report an error.
+		- Text-to-binary uses exactly eight bits per ASCII character. The reverse conversion requires a whole number of eight-bit groups and reports an error if a decoded byte is not ASCII.
+		- JSON escaping handles quotes, backslashes, and control characters using JSON escapes. JSON unescaping rejects malformed escapes and decoded non-ASCII characters, consistent with the module's ASCII-only policy.
+		- HTML escaping handles `&`, `<`, `>`, `"`, and `'`. HTML unescaping supports the corresponding named entities only; unsupported or malformed entities must report an error.
+		- CSV conversion handles exactly one field. Escaping quotes fields that contain commas, quotes, or line breaks, and doubles embedded quotes. Unescaping rejects malformed quoted fields and trailing extra data.
+		- URL query-component encoding uses the same unreserved characters as `url_encode`, but encodes a space as `+`. Decoding converts `+` to a space and rejects malformed percent escapes.
+		- ASCII conversion accepts exactly one ASCII character or a code from 0 through 127. Other input must report an error.
+		- Roman numerals use the standard subtractive notation and support values from 1 through 3999. Parsing accepts uppercase numerals and rejects invalid or non-canonical forms.
+		- RGB components must each be integers from 0 through 255. Hex colors use exactly six hexadecimal digits, with an optional leading `#`; parsing accepts uppercase or lowercase digits. `hex_to_red`, `hex_to_green`, and `hex_to_blue` each return one integer component.
+		- Durations use non-negative whole seconds and the `HH:MM:SS` format. Hours may exceed 23; minutes and seconds must be from 00 through 59. Parsing requires two or more hour digits and exactly two digits for minutes and seconds.
+		- Numeric arguments to byte/bit conversion functions are non-negative whole counts. SI units use powers of 1000 (`kB`, `MB`, `GB`, `TB`, `PB`, `EB`); IEC units use powers of 1024 (`KiB`, `MiB`, `GiB`, `TiB`, `PiB`, `EiB`). `B` means bytes and `bit` means bits. Unit spelling and capitalization are explicit; ambiguous abbreviations such as `KB` are rejected.
+		- `bytes_to_decimal_size` and `bytes_to_binary_size` choose the largest applicable unit, include at most two fractional digits, and remove trailing zeroes. Parsing a size accepts a non-negative decimal number and one supported unit; the result must represent a whole number of bytes or it reports an error.
+		- Bit-to-byte conversion requires a bit count divisible by 8. Byte-to-bit conversion reports an error if the result exceeds the integer range.
+		- Integer-to-bytes accepts a non-negative integer, a byte count from 1 through 8, and byte order `big` or `little`. It returns exactly two lowercase hexadecimal digits per byte, so arbitrary binary bytes remain representable under the module's ASCII-only text policy. It reports an error if the integer does not fit in the requested number of bytes. Bytes-to-integer accepts the same hex representation and byte orders; it rejects empty, odd-length, or invalid hex input and values greater than the language's maximum integer.
+		- Signed/unsigned reinterpretation accepts bit widths from 1 through 63 so every result fits in the language's signed integer type. Inputs must fit the requested width. Conversion uses two's-complement representation and reports errors for out-of-range values.
+		- Float bit conversion supports IEEE 754 binary16 (16 bits), binary32 (32 bits), and binary64 (64 bits). `float_to_bits` returns a string of exactly that many `0`/`1` digits; `bits_to_float` infers the width from a 16-, 32-, or 64-digit input. It rejects other widths and non-bit characters. Encoding rounds to nearest, ties to even; binary16 uses standard subnormal and infinity representations and a canonical quiet NaN. Decoding recognizes the standard IEEE 754 special values.
+		- Gray-code conversion accepts non-negative integers and bit widths from 1 through 63. Encoding returns exactly `bit_width` bits and reports an error if the value does not fit. Decoding accepts 1 through 63 bits.
+		- BCD uses four bits per decimal digit, most significant digit first. Encoding includes one nibble for zero and does not add leading zeroes. Decoding requires a non-empty multiple of four bits; each nibble must represent a decimal digit from 0 through 9. The result must fit in `int`.
+		- LEB128 conversion uses unsigned LEB128 and represents its bytes as two lowercase hex digits each, in encoded byte order. It supports non-negative `int` values. Decoding rejects empty, malformed, overlong, or out-of-range encodings.
+		- ZigZag conversion accepts signed integers from -(2^62) through 2^62-1, ensuring the mapped non-negative value fits in `int`. It uses the standard mapping where 0 maps to 0, -1 to 1, 1 to 2, and so on.
+		- Fixed-point conversion uses a signed 64-bit integer representation with `fractional_bits` from 0 through 62. Encoding multiplies by 2^fractional_bits and rounds to the nearest integer, with halfway values rounded away from zero. It reports errors for non-finite or out-of-range values; decoding divides by the same scale.
+		- RGB888-to-RGB565 accepts three components from 0 through 255 and packs red into bits 11-15, green into bits 5-10, and blue into bits 0-4. Component bits are truncated when packing. RGB565 extraction accepts values from 0 through 65535 and expands 5-bit channels to 8 bits by bit replication (`(v << 3) | (v >> 2)`) and 6-bit green by (`(v << 2) | (v >> 4)`).
+		- PCM conversion supports signed two's-complement samples with bit widths 8, 16, 24, or 32. Byte order is `big` or `little`; bytes are represented as two lowercase hex digits each. Encoders reject samples outside the signed range for the selected width. Decoders require exactly the corresponding number of valid hex bytes.
+		- Offset-binary conversion supports widths 8, 16, 24, or 32. It maps signed samples to unsigned codes by adding 2^(bit_width - 1), and decoding subtracts the same offset. Both functions validate that the input fits the width's respective signed or unsigned range.
+		- Bit-field functions operate on non-negative integers from 0 through 2^63-1. Bit positions are numbered from zero at the least significant bit; `start_bit` must be from 0 through 62, `width` from 1 through 63, and the field must fit within 63 bits. Extraction returns the selected bits shifted down to bit zero. Replacement requires `value` to fit the field width and preserves all other bits.
+		- XML escaping handles `&`, `<`, `>`, `"`, and `'`. XML unescaping supports their five predefined named entities only; unsupported or malformed entities must report an error.
+		- Newline normalization converts CRLF and standalone CR to LF and leaves all other characters unchanged.
+		- The module must report an error for bad input. It must not silently return an incomplete or misleading result.
 
-Usage examples:
-    <include> RSConvert
+	open questions:
+		- How should hex-to-integer handle negative numbers and numbers that are too large?
+			Still needs to be decided.
+		- What are the exact error messages?
+			Still needs to be decided.
 
-    v encoded string = RSConvert.to_base64("Resiris")
-    v decoded string = RSConvert.from_base64(encoded)
+	##These functions use the module function syntax: RSConvert.function_name(arguments).
+	##Functions return string, int, or float. They do not need ModuleObjects.
 
-    v hex_text string = RSConvert.text_to_hex("Hi")
-    v original_text string = RSConvert.hex_to_text(hex_text)
+	Usage:
+	<include> RSConvert
 
-    v number_hex string = RSConvert.integer_to_hex(255)
-    v number int = RSConvert.hex_to_integer(number_hex)
+	v encoded string = RSConvert.to_base64("Resiris")
+	v decoded string = RSConvert.from_base64(encoded)
 
-    v url_text string = RSConvert.url_encode("hello world")
-    v original_url_text string = RSConvert.url_decode(url_text)
+	v hex_text string = RSConvert.text_to_hex("Hi")
+	v original_text string = RSConvert.hex_to_text(hex_text)
 
-    v binary_text string = RSConvert.integer_to_binary(10)
-    v number_from_binary int = RSConvert.binary_to_integer(binary_text)
+	v number_hex string = RSConvert.integer_to_hex(255)
+	v number int = RSConvert.hex_to_integer(number_hex)
 
-    v base_text string = RSConvert.integer_to_base(255, 16)
-    v number_from_base int = RSConvert.base_to_integer(base_text, 16)
+	v url_text string = RSConvert.url_encode("hello world")
+	v original_url_text string = RSConvert.url_decode(url_text)
 
-    v escaped_json string = RSConvert.json_escape("say \"hello\"")
-    v escaped_html string = RSConvert.html_escape("<hello>")
-    v escaped_csv string = RSConvert.csv_escape("hello, world")
-    v query_text string = RSConvert.url_query_encode("hello world")
+	v binary_text string = RSConvert.integer_to_binary(10)
+	v number_from_binary int = RSConvert.binary_to_integer(binary_text)
 
-    v ascii_code int = RSConvert.ascii_to_integer("A")
-    v ascii_char string = RSConvert.integer_to_ascii(65)
+	v base_text string = RSConvert.integer_to_base(255, 16)
+	v number_from_base int = RSConvert.base_to_integer(base_text, 16)
 
-    v roman string = RSConvert.integer_to_roman(2024)
-    v year int = RSConvert.roman_to_integer(roman)
+	v escaped_json string = RSConvert.json_escape("say \"hello\"")
+	v escaped_html string = RSConvert.html_escape("<hello>")
+	v escaped_csv string = RSConvert.csv_escape("hello, world")
+	v query_text string = RSConvert.url_query_encode("hello world")
 
-    v color string = RSConvert.rgb_to_hex(255, 128, 0)
-    v color_red int = RSConvert.hex_to_red(color)
-    v color_green int = RSConvert.hex_to_green(color)
-    v color_blue int = RSConvert.hex_to_blue(color)
-    v duration string = RSConvert.seconds_to_duration(3661)
+	v ascii_code int = RSConvert.ascii_to_integer("A")
+	v ascii_char string = RSConvert.integer_to_ascii(65)
 
-    v decimal_size string = RSConvert.bytes_to_decimal_size(1500000)
-    v binary_size string = RSConvert.bytes_to_binary_size(1572864)
-    v byte_count int = RSConvert.storage_size_to_bytes("1.5 MiB")
-    v bit_count int = RSConvert.bytes_to_bits(4)
+	v roman string = RSConvert.integer_to_roman(2024)
+	v year int = RSConvert.roman_to_integer(roman)
 
-    v byte_hex string = RSConvert.integer_to_bytes(4660, 2, "big")
-    v restored int = RSConvert.bytes_to_integer(byte_hex, "big")
+	v color string = RSConvert.rgb_to_hex(255, 128, 0)
+	v color_red int = RSConvert.hex_to_red(color)
+	v color_green int = RSConvert.hex_to_green(color)
+	v color_blue int = RSConvert.hex_to_blue(color)
+	v duration string = RSConvert.seconds_to_duration(3661)
 
-    v unsigned int = RSConvert.signed_to_unsigned(-1, 8)
-    v signed int = RSConvert.unsigned_to_signed(255, 8)
+	v decimal_size string = RSConvert.bytes_to_decimal_size(1500000)
+	v binary_size string = RSConvert.bytes_to_binary_size(1572864)
+	v byte_count int = RSConvert.storage_size_to_bytes("1.5 MiB")
+	v bit_count int = RSConvert.bytes_to_bits(4)
 
-    v float_bits string = RSConvert.float_to_bits(1.5, 32)
-    v restored_float float = RSConvert.bits_to_float(float_bits)
+	v byte_hex string = RSConvert.integer_to_bytes(4660, 2, "big")
+	v restored int = RSConvert.bytes_to_integer(byte_hex, "big")
 
-    v gray_bits string = RSConvert.integer_to_gray(10, 4)
-    v gray_value int = RSConvert.gray_to_integer(gray_bits)
+	v unsigned int = RSConvert.signed_to_unsigned(-1, 8)
+	v signed int = RSConvert.unsigned_to_signed(255, 8)
 
-    v bcd_bits string = RSConvert.integer_to_bcd(42)
-    v bcd_value int = RSConvert.bcd_to_integer(bcd_bits)
+	v float_bits string = RSConvert.float_to_bits(1.5, 32)
+	v restored_float float = RSConvert.bits_to_float(float_bits)
 
-    v leb_bytes string = RSConvert.integer_to_leb128(300)
-    v leb_value int = RSConvert.leb128_to_integer(leb_bytes)
+	v gray_bits string = RSConvert.integer_to_gray(10, 4)
+	v gray_value int = RSConvert.gray_to_integer(gray_bits)
 
-    v zigzag_value int = RSConvert.signed_to_zigzag(-10)
-    v signed_value int = RSConvert.zigzag_to_signed(zigzag_value)
+	v bcd_bits string = RSConvert.integer_to_bcd(42)
+	v bcd_value int = RSConvert.bcd_to_integer(bcd_bits)
 
-    v fixed_value int = RSConvert.decimal_to_fixed(1.5, 8)
-    v decimal_value float = RSConvert.fixed_to_decimal(fixed_value, 8)
+	v leb_bytes string = RSConvert.integer_to_leb128(300)
+	v leb_value int = RSConvert.leb128_to_integer(leb_bytes)
 
-    v packed_color int = RSConvert.rgb888_to_rgb565(255, 128, 0)
-    v red int = RSConvert.rgb565_to_red(packed_color)
+	v zigzag_value int = RSConvert.signed_to_zigzag(-10)
+	v signed_value int = RSConvert.zigzag_to_signed(zigzag_value)
 
-    v pcm_hex string = RSConvert.pcm_sample_to_bytes(-1000, 16, "little")
-    v pcm_sample int = RSConvert.bytes_to_pcm_sample(pcm_hex, 16, "little")
+	v fixed_value int = RSConvert.decimal_to_fixed(1.5, 8)
+	v decimal_value float = RSConvert.fixed_to_decimal(fixed_value, 8)
 
-    v offset_code int = RSConvert.signed_to_offset_binary(-1000, 16)
-    v signed_sample int = RSConvert.offset_binary_to_signed(offset_code, 16)
+	v packed_color int = RSConvert.rgb888_to_rgb565(255, 128, 0)
+	v red int = RSConvert.rgb565_to_red(packed_color)
 
-    v field int = RSConvert.extract_bit_field(42, 1, 3)
-    v updated int = RSConvert.replace_bit_field(42, 1, 3, 5)
+	v pcm_hex string = RSConvert.pcm_sample_to_bytes(-1000, 16, "little")
+	v pcm_sample int = RSConvert.bytes_to_pcm_sample(pcm_hex, 16, "little")
 
-Proposed rules:
-    - Base64 uses the usual Base64 characters and adds `=` at the end when
-      needed.
-    - Text-to-hex uses two lowercase hex digits for each character.
-    - Hex-to-text accepts uppercase or lowercase digits. It reports an error
-      if there is an odd number of digits or any character is not a hex digit.
-    - Integer-to-hex uses lowercase letters and does not add `0x` at the start.
-    - Hex-to-integer accepts uppercase or lowercase letters, with or without
-      `0x` at the start. How negative numbers and numbers that are too large
-      should work still needs to be decided.
-    - URL encoding leaves letters, numbers, `-`, `.`, `_`, and `~` unchanged.
-      It changes other characters into `%` followed by their hex value.
-      A space becomes `%20`, not `+`.
-    - Binary and octal integer strings do not have `0b` or `0o` prefixes.
-      Binary-to-integer accepts only `0` and `1`; octal-to-integer accepts
-      only digits `0` through `7`.
-    - Base conversion accepts bases from 2 through 36. Output uses lowercase
-      letters for digits above 9; input accepts uppercase or lowercase letters.
-      Invalid bases and digits must report an error.
-    - Text-to-binary uses exactly eight bits per ASCII character. The reverse
-      conversion requires a whole number of eight-bit groups and reports an
-      error if a decoded byte is not ASCII.
-    - JSON escaping handles quotes, backslashes, and control characters using
-      JSON escapes. JSON unescaping rejects malformed escapes and decoded
-      non-ASCII characters, consistent with the module's ASCII-only policy.
-    - HTML escaping handles `&`, `<`, `>`, `"`, and `'`. HTML unescaping
-      supports the corresponding named entities only; unsupported or malformed
-      entities must report an error.
-    - CSV conversion handles exactly one field. Escaping quotes fields that
-      contain commas, quotes, or line breaks, and doubles embedded quotes.
-      Unescaping rejects malformed quoted fields and trailing extra data.
-    - URL query-component encoding uses the same unreserved characters as
-      `url_encode`, but encodes a space as `+`. Decoding converts `+` to a
-      space and rejects malformed percent escapes.
-    - ASCII conversion accepts exactly one ASCII character or a code from
-      0 through 127. Other input must report an error.
-    - Roman numerals use the standard subtractive notation and support values
-      from 1 through 3999. Parsing accepts uppercase numerals and rejects
-      invalid or non-canonical forms.
-    - RGB components must each be integers from 0 through 255. Hex colors use
-      exactly six hexadecimal digits, with an optional leading `#`; parsing
-      accepts uppercase or lowercase digits. `hex_to_red`, `hex_to_green`,
-      and `hex_to_blue` each return one integer component.
-    - Durations use non-negative whole seconds and the `HH:MM:SS` format.
-      Hours may exceed 23; minutes and seconds must be from 00 through 59.
-      Parsing requires two or more hour digits and exactly two digits for
-      minutes and seconds.
-    - Numeric arguments to byte/bit conversion functions are non-negative
-      whole counts. SI units use powers of 1000 (`kB`, `MB`, `GB`, `TB`, `PB`,
-      `EB`); IEC units use powers of 1024 (`KiB`, `MiB`, `GiB`, `TiB`, `PiB`,
-      `EiB`). `B` means bytes and `bit` means bits. Unit spelling and
-      capitalization are explicit; ambiguous abbreviations such as `KB` are
-      rejected.
-    - `bytes_to_decimal_size` and `bytes_to_binary_size` choose the largest
-      applicable unit, include at most two fractional digits, and remove
-      trailing zeroes. Parsing a size accepts a non-negative decimal number
-      and one supported unit; the result must represent a whole number of
-      bytes or it reports an error.
-    - Bit-to-byte conversion requires a bit count divisible by 8. Byte-to-bit
-      conversion reports an error if the result exceeds the integer range.
-    - Integer-to-bytes accepts a non-negative integer, a byte count from 1
-      through 8, and byte order `big` or `little`. It returns exactly two
-      lowercase hexadecimal digits per byte, so arbitrary binary bytes remain
-      representable under the module's ASCII-only text policy. It reports an
-      error if the integer does not fit in the requested number of bytes.
-      Bytes-to-integer accepts the same hex representation and byte orders;
-      it rejects empty, odd-length, or invalid hex input and values greater
-      than the language's maximum integer.
-    - Signed/unsigned reinterpretation accepts bit widths from 1 through 63
-      so every result fits in the language's signed integer type. Inputs must
-      fit the requested width. Conversion uses two's-complement representation
-      and reports errors for out-of-range values.
-    - Float bit conversion supports IEEE 754 binary16 (16 bits), binary32
-      (32 bits), and binary64 (64 bits). `float_to_bits` returns a string of
-      exactly that many `0`/`1` digits; `bits_to_float` infers the width from
-      a 16-, 32-, or 64-digit input. It rejects other widths and non-bit
-      characters. Encoding rounds to nearest, ties to even; binary16 uses
-      standard subnormal and infinity representations and a canonical quiet
-      NaN. Decoding recognizes the standard IEEE 754 special values.
-    - Gray-code conversion accepts non-negative integers and bit widths from
-      1 through 63. Encoding returns exactly `bit_width` bits and reports an
-      error if the value does not fit. Decoding accepts 1 through 63 bits.
-    - BCD uses four bits per decimal digit, most significant digit first.
-      Encoding includes one nibble for zero and does not add leading zeroes.
-      Decoding requires a non-empty multiple of four bits; each nibble must
-      represent a decimal digit from 0 through 9. The result must fit in `int`.
-    - LEB128 conversion uses unsigned LEB128 and represents its bytes as
-      two lowercase hex digits each, in encoded byte order. It supports
-      non-negative `int` values. Decoding rejects empty, malformed, overlong,
-      or out-of-range encodings.
-    - ZigZag conversion accepts signed integers from -(2^62) through
-      2^62-1, ensuring the mapped non-negative value fits in `int`. It uses
-      the standard mapping where 0 maps to 0, -1 to 1, 1 to 2, and so on.
-    - Fixed-point conversion uses a signed 64-bit integer representation with
-      `fractional_bits` from 0 through 62. Encoding multiplies by
-      2^fractional_bits and rounds to the nearest integer, with halfway values
-      rounded away from zero. It reports errors for non-finite or out-of-range
-      values; decoding divides by the same scale.
-    - RGB888-to-RGB565 accepts three components from 0 through 255 and packs
-      red into bits 11-15, green into bits 5-10, and blue into bits 0-4.
-      Component bits are truncated when packing. RGB565 extraction accepts
-      values from 0 through 65535 and expands 5-bit channels to 8 bits by
-      bit replication (`(v << 3) | (v >> 2)`) and 6-bit green by
-      (`(v << 2) | (v >> 4)`).
-    - PCM conversion supports signed two's-complement samples with bit widths
-      8, 16, 24, or 32. Byte order is `big` or `little`; bytes are represented
-      as two lowercase hex digits each. Encoders reject samples outside the
-      signed range for the selected width. Decoders require exactly the
-      corresponding number of valid hex bytes.
-    - Offset-binary conversion supports widths 8, 16, 24, or 32. It maps
-      signed samples to unsigned codes by adding 2^(bit_width - 1), and
-      decoding subtracts the same offset. Both functions validate that the
-      input fits the width's respective signed or unsigned range.
-    - Bit-field functions operate on non-negative integers from 0 through
-      2^63-1. Bit positions are numbered from zero at the least significant
-      bit; `start_bit` must be from 0 through 62, `width` from 1 through 63,
-      and the field must fit within 63 bits. Extraction returns the selected
-      bits shifted down to bit zero. Replacement requires `value` to fit the
-      field width and preserves all other bits.
-    - XML escaping handles `&`, `<`, `>`, `"`, and `'`. XML unescaping supports
-      their five predefined named entities only; unsupported or malformed
-      entities must report an error.
-    - Newline normalization converts CRLF and standalone CR to LF and leaves
-      all other characters unchanged.
-    - The module must report an error for bad input. It must not silently
-      return an incomplete or misleading result. The exact error messages
-      still need to be decided.
+	v offset_code int = RSConvert.signed_to_offset_binary(-1000, 16)
+	v signed_sample int = RSConvert.offset_binary_to_signed(offset_code, 16)
 
-Implementation notes:
-    - These functions use the module function syntax:
-      `RSConvert.function_name(arguments)`.
-    - Functions return `string`, `int`, or `float`. They do not need
-      ModuleObjects.
+	v field int = RSConvert.extract_bit_field(42, 1, 3)
+	v updated int = RSConvert.replace_bit_field(42, 1, 3, 5)

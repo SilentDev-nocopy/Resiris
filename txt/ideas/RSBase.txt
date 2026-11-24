@@ -1,0 +1,42 @@
+include command: <include> RSBase
+
+Its purpose and usage is to create timer handles that can call a named Resiris function after a timeout.
+
+timer stuff: EspAndPc
+
+	functions:
+		RSBase.await() -> main function for every timer script. Returns a ModuleObject timer handle.
+		timer.set_timer(seconds float) -> starts or replaces the countdown from now. Returns the same ModuleObject.
+		timer.on_timeout(function_name string) -> sets the name of the function to call when the timer expires. Returns the same ModuleObject.
+		timer.reset_timer() -> restarts the previous duration from now. Returns the same ModuleObject.
+		timer.stop_timer() -> stops the countdown. Returns the same ModuleObject.
+		timer.free_timer() -> stops the countdown and marks the timer freed. Returns the same ModuleObject.
+		timer.process() -> returns the seconds remaining as float, or 0.0 if the timer is stopped or expired.
+
+		The timer does not advance by itself. Call process() regularly, normally once per PROCESS(FPS) frame.
+		When the countdown expires, process() returns 0.0 and schedules the callback at most once. The interpreter invokes the named function after the object-method call completes.
+		Set or reset the timer to allow another timeout.
+		The callback name is not validated by on_timeout(). An invalid name raises an error when the interpreter tries to invoke it.
+		free_timer() does not invalidate the handle. set_timer() or reset_timer() can reactivate the same state.
+
+	open questions:
+		- Does the callback run again if process() is called after expiry?
+			No. It is scheduled at most once; set or reset the timer to allow another timeout.
+		- Does free_timer() make the handle unusable?
+			No. The handle still refers to the same state and can be reactivated.
+
+	Usage:
+	<include> RSBase
+
+	c FPS float = 10.0
+	v timer ModuleObject = RSBase.await()
+
+	START():
+		timer.set_timer(0.5)
+		timer.on_timeout("timeout")
+
+	PROCESS(FPS):
+		print_cmd(timer.process())
+
+	fn timeout():
+		print_cmd("timer expired")

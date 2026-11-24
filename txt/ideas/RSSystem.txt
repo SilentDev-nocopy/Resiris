@@ -1,0 +1,51 @@
+include command: <include> RSSystem
+
+Its purpose and usage is to report runtime facts and ESP32 hardware information.
+
+system stuff: EspAndPc
+
+	functions:
+		All functions take no arguments. The module exports no user constants and creates no ModuleObjects.
+
+		RSSystem.cpu_cores() -> int; the ESP32 core count or the host's reported hardware concurrency.
+		RSSystem.cpu_load() -> float; the program load percentage supplied by the active runtime.
+		RSSystem.uptime() -> float; seconds since the current program run started.
+		RSSystem.modules() -> string; comma-separated names of all modules registered in this build, not only modules included by the script.
+		RSSystem.report() -> string; formatted summary. It includes hardware rows on ESP32 and omits them on PC.
+
+		cpu_load(), uptime() and report() require the host runtime to have installed a program clock.
+		cpu_cores() throws an error if the host cannot report a non-zero core count.
+
+hardware stuff: EspOnly
+
+	functions:
+		These functions read the device's actual ESP32-WROOM-32 hardware. They throw a ModuleError on a PC rather than returning fabricated values.
+
+		RSSystem.chip_model() -> string; chip model name.
+		RSSystem.chip_revision() -> int; silicon revision.
+		RSSystem.cpu_speed() -> int; CPU frequency in MHz.
+		RSSystem.memory_total() -> int; total heap bytes.
+		RSSystem.memory_free() -> int; currently free heap bytes.
+		RSSystem.memory_used() -> int; total heap minus free heap.
+		RSSystem.memory_min_free() -> int; lowest free heap observed since boot.
+		RSSystem.psram_size() -> int; PSRAM bytes, or 0 if there is no PSRAM.
+		RSSystem.flash_total() -> int; physical flash capacity in bytes.
+		RSSystem.flash_used() -> int; size of the application partition in bytes.
+
+		flash_used() reports the application partition's reserved capacity. It is not a count of bytes currently occupied by firmware or filesystem data.
+
+	open questions:
+		- Do the hardware functions work on PC?
+			No. They throw a ModuleError on PC.
+		- Does report() include hardware rows on PC?
+			No. It omits them on PC.
+		- Does flash_used() show the bytes currently used by firmware?
+			No. It shows the application partition's reserved capacity.
+
+	Usage:
+	<include> RSSystem
+
+	print_cmd(RSSystem.cpu_cores())
+	print_cmd(RSSystem.uptime())
+	print_cmd(RSSystem.modules())
+	print_cmd(RSSystem.report())
