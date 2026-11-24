@@ -12,19 +12,20 @@ network stuff: EspOnly
 
 
 	functions:
-		RSNetwork.wifi() -> main function for most of Wi-Fi-related script.
-			get_all_networks() -> returns every Wi-Fi network name (SSID) as a string and they seperated with", ". 
-			connect(ssid string, password string) -> bool; connects to the given network with the password.
-			set_route_mode(mode string) -> bool; mode must be RSNetwork[ROUTEMODE_CRE], RSNetwork[ROUTEMODE_SR] or RSNetwork[ROUTEMODE_MB].
-		Get the handle first: v wifi ModuleObject = RSNetwork.wifi(), then call wifi.connect(...) or wifi.set_route_mode(...).
-			get_ip(SSID string) # to get own ip, you have to write the runner devide own ssid. otherwise it returns the called ssid's ip
-			get_ssid(ip string) ## for example: "192.162.1.4"
-			disconnect() -> disconnect from the currently connected network. It gives no value.
-			get_route_mode() -> gives back the current ROUTEMODE.
-			set_route_info(ssid string, password string) ->only usable with SR ! if not used in SR mode, give error:"Use it with SR mode" #or something like that
+		RSNetwork.wifi() -> ModuleObject; returns the Wi-Fi handler for the current program.
+		Get the handle first: v wifi ModuleObject = RSNetwork.wifi(), then call wifi.connect(...) or wifi.set_route_mode(...). The methods below are called on that handle.
+			get_all_networks() -> string; returns every visible Wi-Fi network name (SSID) as one string, separated with ", ".
+			connect(ssid string, password string) -> bool; connects to the given network with the password. Returns false if the connection fails.
+			set_route_mode(mode string) -> bool; mode must be RSNetwork[ROUTEMODE_CRE], RSNetwork[ROUTEMODE_SR] or RSNetwork[ROUTEMODE_MB]. Any other value throws an error.
+			get_ip(ssid string) -> string; returns the device's own IP when ssid is the runner device's own SSID, otherwise the IP associated with the given SSID. Throws an error if the SSID cannot be resolved.
+			get_ssid(ip string) -> string; returns the SSID associated with the given IP, for example "192.168.1.4". Throws an error if no network matches.
+			disconnect() -> bool; disconnects from the currently connected network. Returns true on success, or false if there was no connection.
+			get_route_mode() -> string; returns the current route mode: RSNetwork[ROUTEMODE_CRE], RSNetwork[ROUTEMODE_SR] or RSNetwork[ROUTEMODE_MB].
+			set_route_info(ssid string, password string) -> bool; sets the access-point name and password. Only usable in SR mode; in other modes it throws "RSNetwork.set_route_info: only usable in SR mode".
 			get_own_route_info() -> string; returns the route info with the password masked as X***Y. Call it inside print_cmd() to display it.
-					RSNetwork.create_wifi_data_process_handler() -> its a makes a handler. with this you can get any "constanstly changing data" like current network speed and others. Use it in START(). It contains its own process() function so process() function is not needed to typed out. Also process() is not an actuall RSNetwork function!
-			wifi_data_handler.get_global_speed() -> float; gives back the currently connected network's global speed which is calculated from the download and the upload speed. Call it on the ModuleObject created by RSNetwork.create_wifi_data_process_handler() in START(). For best use: use it in PROCESS(FPS). Only usable after the handler is created, else gives an error!
+
+		RSNetwork.create_wifi_data_process_handler() -> ModuleObject; creates the handler for constantly changing Wi-Fi data such as the current network speed. Create it in START(). It updates itself internally, so the program does not call process() on it; process() is not an RSNetwork function.
+			get_global_speed() -> float; returns the currently connected network's global speed, calculated from the download and upload speed. Call it on the handler created in START(), normally in PROCESS(FPS). It is available only after the handler has been created.
 
 
 	Usage:
@@ -62,72 +63,67 @@ network stuff: EspOnly
 
 hosting a website/server: EspAndPc
 
-	The main goal is for the hosting hardware to have as little work to do as possible! That's why we don't use JavaScript or CSS on the hosting side! Let's leave the heavy computation to the client!
-	It runs only HTML. No JavaScript or CSS! The client can use JavaScript, CSS, and other client-side technologies.
+	The main goal is for the hosting hardware to have as little work to do as possible. The server stores and serves HTML and one static JavaScript file; it does not run JavaScript or CSS on the host. The client may use JavaScript, CSS, and other client-side technologies.
 
 
 	functions:
-		html_server_handler() -> main function for using HTML servers. Without it, the server cannot exist because it will have no handler.
-			create_server(port_number int) -> creates the server with its handler.
-		set_page_content(html string) -> sets the server front page HTML content.
-		set_client_script(js string) -> sets the JavaScript served at /rsclient.js. Call it before start_server(). If it is not set, /rsclient.js returns an empty response.
-		start_server() -> starts the server so it can be accessed by entering the hardware's IP address in a browser. If create_server() has not been called, display: "Error: Server not initialized. Call create_server(port_number) before start_server()."
-		process() -> accepts one new request and sends the buffered response on the next call.
+		RSNetwork.html_server_handler() -> ModuleObject; returns the HTML server handler. Without it the server cannot exist because it has no handler.
+			create_server(port_number int) -> bool; creates the server with its handler. Returns true on success and throws an error for an invalid port or a duplicate call.
+			set_page_content(html string) -> bool; stores the HTML served at the root path ("/").
+			set_client_script(js string) -> bool; stores the JavaScript served at /rsclient.js. Call it before start_server(). If it is not set, /rsclient.js returns an empty response.
+			start_server() -> bool; starts the server so it can be accessed by entering the hardware's IP address in a browser. If create_server() has not been called, it throws "RSNetwork.start_server: call create_server(port_number) first".
+			process() -> bool; first sends the response buffered since the previous call, then accepts at most one new request. Returns true when it handled a request.
 
-		request_string_data()
+		request_string_data() -> string
 			Returns the most recent string data received since the last process() call.
 			Repeated calls return the same most recent data until a new request arrives.
 			Throws "RSNetwork.request_string_data: no most recent string data" if none.
 
-		request_int_data()
+		request_int_data() -> int
 			Returns the most recent int data received since the last process() call.
 			Repeated calls return the same most recent data until a new request arrives.
 			Throws "RSNetwork.request_int_data: no most recent int data" if none.
 
-		request_float_data()
+		request_float_data() -> float
 			Returns the most recent float data received since the last process() call.
 			Repeated calls return the same most recent data until a new request arrives.
 			Throws "RSNetwork.request_float_data: no most recent float data" if none.
 
-		request_boolean_data()
+		request_boolean_data() -> bool
 			Returns the most recent bool data received since the last process() call.
 			Repeated calls return the same most recent data until a new request arrives.
 			Throws "RSNetwork.request_boolean_data: no most recent bool data" if none.
 
-		get_request_state()
+		get_request_state() -> bool
 			True only while the most recent data is unread.
 
-		respond_string_data(value string)
+		respond_string_data(value string) -> bool
 			Buffers a string response for the most recent request; the next process() call sends it.
 			A later response call overwrites the buffered response.
 
-		respond_int_data(value int)
+		respond_int_data(value int) -> bool
 			Buffers an int response for the most recent request; the next process() call sends it.
 			A later response call overwrites the buffered response.
 
-		respond_float_data(value float)
+		respond_float_data(value float) -> bool
 			Buffers a float response for the most recent request; the next process() call sends it.
 			A later response call overwrites the buffered response.
 
-		respond_boolean_data(value bool)
+		respond_boolean_data(value bool) -> bool
 			Buffers a bool response for the most recent request; the next process() call sends it.
 			A later response call overwrites the buffered response.
 
-		## Each function throws an error if no request is currently awaiting a response.
+		## The respond_* functions throw "RSNetwork.respond_<type>_data: no request awaiting a response" if there is no current request.
 
-	open questions:
-		- What URL should the browser call? For example: /call/add/2/3, /call/add?a=2&b=3, or a JSON body?
-			Browser requests use URL query parameters, for example /call/add?value=5. Only the most recent data from the most recent request is kept.
-		- Can the server keep several requests waiting?
-			Only one at a time.
-		- If the browser sends 2 and 3, do two request_int_data() calls return 2 then 3, or does each getter read a different typed field of the same request?
-			The most recent data wins. Repeated calls to the same request function still return the most recent data.
-		- What text should the browser receive for each response type? For example: true -> "true", 5 -> "5", 1.5 -> "1.5".
-			true -> "true", 5 -> "5", 1.5 -> "1.5"
-		- If respond_*_data() is called twice for one request, is the first answer kept, the last answer sent, or is it an error?
-			Always the most recent.
-		- Should get_request_state() be true only while data is unread, or also after the data is read but before respond() is called?
-			Only while the most recent data is unread. After it is read, the response is sent on the next process() call.
+	rules:
+		- Browser requests use URL query parameters, for example /call/add?value=5. Only the most recent request is kept.
+		- The server keeps at most one pending request. Older requests are dropped.
+		- The most recent typed data wins. Repeated calls to the same request function still return that most recent value.
+		- Response text is true -> "true", 5 -> "5", 1.5 -> "1.5".
+		- A later respond_*_data() call overwrites the buffered response.
+		- A request becomes read on the first request_*_data() call for it. get_request_state() reports whether the current request has been read; get_request_state() itself does not mark it read.
+		- After a request has been read, the buffered response is sent on the next process() call. If no response was buffered, the browser receives an empty body.
+		- On PC the Wi-Fi functions throw a ModuleError. On PC the HTML server binds to 127.0.0.1; on ESP32 it binds to the device's Wi-Fi IP address.
 
 	client script:
 
@@ -190,10 +186,11 @@ hosting a website/server: EspAndPc
 	c FPS float = 10.0
 	v page ModuleObject = RSNetwork.html_server_handler()
 	c port_number int = 8080
-	c rsclient_js string = "..." ## the rsclient.js script from the client script section
+	c rsclient_js string = "..." ## the rsclient.js script from the client script section, as one escaped string literal
 	v html_page_content string = "<!DOCTYPE html> <html><head><title>My Page</title></head><body><input id='num' value='5'><button rs-call='add' rs-value-from='#num' rs-target='#out'>Send</button><output id='out'>...</output><script src='/rsclient.js'></script></body></html>"
 
 	START():
+		## On ESP32, connect to Wi-Fi first (see the Wi-Fi usage above).
 		page.create_server(port_number)
 		page.set_page_content(html_page_content)
 		page.set_client_script(rsclient_js)
