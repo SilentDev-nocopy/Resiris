@@ -1,29 +1,41 @@
 include command: <include> RSNetwork
 
-its purpose and usage is to make servers or webpages served localy and also access the web and using the wifi. 
-
-	functions:
-		RSNetwork.wifi() -> main function for every wifi orianted script.
-		RSNetwork.wifi().get_all_networks() -> gives back every wifi port name as string.
-
-		
-		
+Its purpose and usage is to make servers or webpages served locally and also to access the web using Wi-Fi.
 
 
+network stuff: EspOnly
 
-hosting a website/server:
-
-	The main goal is for the hosting hardware to have as little work to do as possible! That why we dont use java or css on the hosting side! Lets give the client every hard computing!
-	It runs only html. No java or css! The client can use java and css and the others.
+	constants:
+		ROUTEMODE = "connect_to_existing_router, -> ESP 'station (STA)' mode -> short: CXE
+					self_router, -> ESP 'access point (AP)' mode -> short: SR
+					man_in_between, -> ESP 'dual mode (STA+AP)' -> short: MB"
 
 
 	functions:
-		html_server_handler() -> main function for the usage of html servers. Without it, the server cant exist beacuse itt will miss the handler!
+		RSNetwork.wifi() -> main function for every Wi-Fi oriented script.
+		RSNetwork.wifi().get_all_networks() -> gives back every Wi-Fi network name (SSID) as string.
+		RSNetwork.wifi().connect(SSID, password) ->connect to the given network with the password
+		RSNetwork.wifi().set_route_mode()
+
+
+
+
+
+
+hosting a website/server: EspAndPc
+
+	The main goal is for the hosting hardware to have as little work to do as possible! That's why we don't use JavaScript or CSS on the hosting side! Let's leave the heavy computation to the client!
+	It runs only HTML. No JavaScript or CSS! The client can use JavaScript, CSS and others.
+
+
+	functions:
+		html_server_handler() -> main function for the usage of HTML servers. Without it, the server can't exist because it will miss the handler!
 		create_server(port_number as int) -> creates the server by its handler.
-		set_page_content(file_path or a string type variable) -> sets the server front page html file. #file path is currently not avaible! maybe in later version!
+		set_page_content(file_path or a string type variable) -> sets the server front page HTML file. #file path is currently not available! maybe in later version!
+		set_client_script(js string) -> sets the JavaScript served at /rsclient.js. Call it before start_server(). If it is not set, /rsclient.js returns an empty response.
 		start_server() -> starts the server so it can be accessed by entering the hardware's IP address in a browser. If create_server() has not been called, display: "Error: Server not initialized. Call create_server(port_number) before start_server()."
 		process() -> accepts one new request and sends the buffered response on the next call.
-		
+
 		request_string_data()
 			Returns the most recent string data received since the last process() call.
 			Repeated calls return the same most recent data until a new request arrives.
@@ -81,7 +93,9 @@ hosting a website/server:
 
 	client script:
 
-		The host serves the same fixed script on every page. The page only declares which button calls which name.
+		The script is given to the module with set_client_script(js string) and served at /rsclient.js.
+		One script is enough for every page; it does not have to be written into each HTML page.
+		The page only declares which button calls which name.
 
 		HTML in the page:
 
@@ -138,16 +152,17 @@ hosting a website/server:
 	c FPS float = 10.0
 	v page ModuleObject = RSNetwork.html_server_handler()
 	c port_number int = 8080
-	v html_page_content string = "<!DOCTYPE html> <html><head><title>My Page</title></head><body><h1>Hello World!</h1></body></html>"
+	c rsclient_js string = "..." ## the rsclient.js script from the client script section
+	v html_page_content string = "<!DOCTYPE html> <html><head><title>My Page</title></head><body><input id='num' value='5'><button rs-call='add' rs-value-from='#num' rs-target='#out'>Send</button><output id='out'>...</output><script src='/rsclient.js'></script></body></html>"
 
 	START():
 		page.create_server(port_number)
 		page.set_page_content(html_page_content)
+		page.set_client_script(rsclient_js)
 		page.start_server()
-		
+
 	PROCESS(FPS):
 		page.process()
 		if page.get_request_state():
 			v data_from_page int = page.request_int_data()
 			page.respond_string_data("ok")
-			

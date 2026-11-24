@@ -1,118 +1,68 @@
-########################
+# RSBase timer module
+
 ## 1. RSBase module
-########################################################################
 
-RSBase:
-    A native C++ module registered by the Resiris CLI.
-    It provides timer objects driven by the interpreter's PROCESS frame clock.
+`RSBase` is a native C++ module registered by the Resiris CLI. It provides timer objects driven by the interpreter's `PROCESS` frame clock.
 
-Include:
-    <include> RSBase
+```resiris
+<include> RSBase
+```
 
-
-########################################################################
 ## 2. Creating a timer
-########################################################################
 
-RSBase.await():
-    Creates a new timer object and returns it as a ModuleObject.
-    It does not take any arguments.
+`RSBase.await()` creates a new timer object and returns it as a `ModuleObject`. It does **not** take any arguments.
 
-    Example:
-        v timer ModuleObject = RSBase.await()
+```resiris
+v timer ModuleObject = RSBase.await()
+```
 
-
-########################################################################
 ## 3. Timer functions
-########################################################################
 
-set_timer(seconds):
-    Sets the timer duration and starts or restarts the timer from the
-    current frame time.
-    It takes one argument. The value must be convertible to float.
-    Returns the same timer object.
+| Method | Arguments | Returns | Description |
+| --- | --- | --- | --- |
+| `set_timer(seconds)` | One value, convertible to `float` | The same timer object | Sets the timer duration and starts or restarts the timer from the current frame time. |
+| `on_timeout(function_name)` | One `string` | The same timer object | Sets the name of a Resiris function that runs when the timer expires. The callback runs once when `process()` detects expiry. The name is not checked when set; it must resolve to a callable Resiris function when the timeout callback is dispatched. |
+| `reset_timer()` | None | The same timer object | Resets the timer start point to the current frame time, starts it again, and clears the fired state. |
+| `stop_timer()` | None | The same timer object | Stops the timer. |
+| `free_timer()` | None | The same timer object | Stops the timer and marks its internal state as freed. |
+| `process()` | None | `float` | Checks the timer using the current interpreter frame time. Returns the remaining time as a `float` while the timer is running and has time left; returns `0.0` if it has not been started, is stopped, or has expired. When it first detects expiry, the registered callback is queued and invoked by the interpreter after the method call completes. |
 
-on_timeout(function_name):
-    Sets the name of a Resiris function that runs when the timer expires.
-    It takes one string argument.
-    The callback runs once when `process()` detects that the timer expired.
-    The name is not checked when set; it must resolve to a callable Resiris
-    function when the timeout callback is dispatched.
-    Returns the same timer object.
-
-reset_timer():
-    Resets the timer start point to the current frame time and starts it
-    again. It also clears the fired state.
-    It takes no arguments.
-    Returns the same timer object.
-
-stop_timer():
-    Stops the timer.
-    It takes no arguments.
-    Returns the same timer object.
-
-free_timer():
-    Stops the timer and marks its internal state as freed.
-    It takes no arguments.
-    Returns the same timer object.
-
-process():
-    Checks the timer using the current interpreter frame time.
-    It takes no arguments.
-
-    Returns the remaining time as a float while the timer is running and has
-    time left. Returns 0.0 if it has not been started, is stopped, or has
-    expired. When it first detects expiry, the registered callback is queued
-    and invoked by the interpreter after the method call completes.
-
-
-########################################################################
 ## 4. How does the timer work?
-########################################################################
 
-- RSBase does not use a separate real-time clock.
+- `RSBase` does **not** use a separate real-time clock.
 - The interpreter gives the timer the current frame time.
-- The frame clock advances once per PROCESS frame by `1 / FPS`, before that
-  frame's body runs.
-- The timer's accuracy therefore depends on the FPS value.
-- If PROCESS is not running, the timer does not advance.
+- The frame clock advances once per `PROCESS` frame by `1 / FPS`, before that frame's body runs.
+- The timer's accuracy therefore depends on the `FPS` value.
+- If `PROCESS` is not running, the timer does not advance.
 - `process()` must be called from the running program to check the timer.
-- `process()` returns the remaining duration, not a bool.
-- A negative duration is accepted by the current implementation and will be
-  considered expired on the next `process()` call.
+- `process()` returns the remaining duration, **not** a bool.
+- A negative duration is accepted by the current implementation and will be considered expired on the next `process()` call.
 
-
-########################################################################
 ## 5. Example
-########################################################################
 
-    <include> RSBase
+```resiris
+<include> RSBase
 
-    c FPS float = 10.0
-    v timer ModuleObject = RSBase.await()
-    v remaining float = 0.0
+c FPS float = 10.0
+v timer ModuleObject = RSBase.await()
+v remaining float = 0.0
 
-    fn timer_done():
-        print_cmd("timer finished")
+fn timer_done():
+    print_cmd("timer finished")
 
-    START():
-        timer.set_timer(0.5)
-        timer.on_timeout("timer_done")
+START():
+    timer.set_timer(0.5)
+    timer.on_timeout("timer_done")
 
-    PROCESS(FPS):
-        remaining = timer.process()
-        print_cmd(remaining)
+PROCESS(FPS):
+    remaining = timer.process()
+    print_cmd(remaining)
+```
 
-
-########################################################################
 ## 6. Important notes
-########################################################################
 
 - The timer's state is stored inside the module.
-- The Resiris program keeps a ModuleObject handle to the timer.
-- `set_timer`, `on_timeout`, `reset_timer`, `stop_timer`, `free_timer`
-  and `process` are object methods.
+- The Resiris program keeps a `ModuleObject` handle to the timer.
+- `set_timer`, `on_timeout`, `reset_timer`, `stop_timer`, `free_timer`, and `process` are object methods.
 - `RSBase.await()` creates the timer object.
-- `free_timer()` stops the timer and marks its internal state as freed; it
-  does not invalidate the Resiris handle, and `set_timer()` or
-  `reset_timer()` can start it again.
+- `free_timer()` stops the timer and marks its internal state as freed; it does **not** invalidate the Resiris handle, and `set_timer()` or `reset_timer()` can start it again.

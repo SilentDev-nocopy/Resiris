@@ -1,176 +1,113 @@
-########################
+# Native module system
+
 ## 1. Modules
-########################################################################
 
-What is a Resiris module?
-    A module is a native C++ component that can be used from a Resiris
-    program. It provides functions, constants or objects.
+A Resiris **module** is a native C++ component that can be used from a Resiris program. It provides functions, constants, or objects.
 
-Current Resiris modules:
-    RSMath
-    RSBase
-    RSConvert
-    RSSignal
+Current modules:
 
-The modules are compiled into the application. Resiris does not load module
-files dynamically from a Modules folder.
+- `RSMath`
+- `RSBase`
+- `RSConvert`
+- `RSSignal`
 
-The CLI is a desktop program. In this build RSSignal is a stateful simulation;
-it does not access physical ESP32 pins or an ADC. See
-`rssignal_module.txt` for its simulated behavior and
-`esp32_gpio_table.txt` for hardware planning information.
+The modules are **compiled into the application**. Resiris does not load module files dynamically from a `Modules` folder.
 
+> [!NOTE]
+> The CLI is a desktop program. In this build `RSSignal` is a stateful simulation; it does not access physical ESP32 pins or an ADC. See [rssignal_module.md](rssignal_module.md) for its simulated behavior and [esp32_gpio_table.md](esp32_gpio_table.md) for hardware planning information.
 
-########################################################################
 ## 2. Including a module
-########################################################################
 
-<include>:
-    Includes a module that is registered in the C++ module registry.
+`<include>` includes a module that is registered in the C++ module registry. A module must be included **before** its functions or constants are used. The include statement does not have to be on the first line of the program.
 
-    Examples:
-        <include> RSMath
-        <include> RSBase
-        <include> RSMath, RSBase
+```resiris
+<include> RSMath
+<include> RSBase
+<include> RSMath, RSBase
+```
 
-A module must be included before its functions or constants are used.
+| Situation | Error |
+| --- | --- |
+| Missing module | `{ModuleName} not found! Error code:"MissingModule"` |
+| Including the same module more than once | `{ModuleName} is already included. Error code:"SameModuleMultiCall"` |
 
-Missing module:
-    `{ModuleName} not found! Error code:"MissingModule"`
-
-Including the same module more than once:
-    `{ModuleName} is already included. Error code:"SameModuleMultiCall"`
-
-The include statement does not have to be on the first line of the program.
-
-
-########################################################################
 ## 3. Using module functions and constants
-########################################################################
 
-Module functions:
-    Module functions are called with the module name and a dot.
-    Examples:
-        RSMath.sqrt(25)
-        RSBase.await()
+| Item | Syntax | Example |
+| --- | --- | --- |
+| Module functions | Module name and a dot | `RSMath.sqrt(25)` |
+| Module constants | Square brackets | `RSMath[PI]`, `RSMath[E]` |
 
-Module constants:
-    Module constants are accessed with square brackets.
-    Examples:
-        RSMath[PI]
-        RSMath[E]
+| Situation | Error |
+| --- | --- |
+| Unknown function | `{ModuleName}.{function}: unknown module function` |
+| Unknown constant | `{ModuleName}.{constant}: unknown module constant` |
 
-Unknown function:
-    `{ModuleName}.{function}: unknown module function`
-
-Unknown constant:
-    `{ModuleName}.{constant}: unknown module constant`
-
-
-########################################################################
 ## 4. ModuleObject
-########################################################################
 
-ModuleObject:
-    A module can return an object that is stored in a ModuleObject variant.
+A module can return an object that is stored in a `ModuleObject` variant:
 
-    Example:
-        v timer ModuleObject = RSBase.await()
+```resiris
+v timer ModuleObject = RSBase.await()
+```
 
-Object methods:
-    The methods of a ModuleObject are called with dot syntax.
+The methods of a `ModuleObject` are called with dot syntax:
 
-    Example:
-        timer.set_timer(1.0)
-        timer.process()
+```resiris
+timer.set_timer(1.0)
+timer.process()
+```
 
 The interpreter sends the method call to the module that owns the object.
 
-
-########################################################################
 ## 5. C++ module interface
-########################################################################
 
-A C++ module implements the `Module` interface from:
-    include/resiris/module.hpp
+A C++ module implements the `Module` interface from `include/resiris/module.hpp`. The interface contains six pure virtual methods:
 
-The interface contains:
-    module_name()
-    function_names()
-    variables()
-    call_function(...)
-    call_object_method(...)
-    get_constant(...)
+- `module_name()`
+- `function_names()`
+- `variables()`
+- `call_function(...)`
+- `call_object_method(...)`
+- `get_constant(...)`
 
-These are six pure virtual methods. Object method names must also appear in
-`function_names()`. The CLI constructs the modules explicitly in `src/cli.cpp`.
+Object method names must also appear in `function_names()`. The CLI constructs the modules explicitly in `src/cli.cpp`.
 
-The module provides its exported constants through `variables()` and
-`get_constant()`.
-The type declared in `variables()` is checked against the returned value.
+The module provides its exported constants through `variables()` and `get_constant()`. The type declared in `variables()` is checked against the returned value.
 
 The module registry also provides these metadata values:
-    NAME:
-        The module name.
 
-    FUNCTIONS:
-        A comma-separated list of function names.
+| Metadata | Meaning |
+| --- | --- |
+| `NAME` | The module name. |
+| `FUNCTIONS` | A comma-separated list of function names. |
+| `VARIABLES` | A comma-separated list of `name:type` entries. |
 
-    VARIABLES:
-        A comma-separated list of name:type entries.
-    These three values are provided by ModuleRegistry and do not need to be
-    implemented by `get_constant()`.
+These three values are provided by `ModuleRegistry` and do not need to be implemented by `get_constant()`.
 
-
-########################################################################
 ## 6. Function arguments and return values
-########################################################################
 
-Supported module function arguments:
-    bool
-    int
-    float
-    string
+| Direction | Supported types |
+| --- | --- |
+| Function arguments | `bool`, `int`, `float`, `string` |
+| Function return values | `bool`, `int`, `float`, `string`, `ModuleObject` |
 
-Other argument types are rejected with:
-    UnknownModuleArgument
+Other argument types are rejected with `UnknownModuleArgument`. Other return types are rejected as well.
 
-Supported module function return values:
-    bool
-    int
-    float
-    string
-    ModuleObject
+A module function must check its own argument count and any function-specific argument types. For an invalid function signature it throws `ModuleSignatureError`.
 
-Other return types are rejected.
+The registry only permits `bool`, `int`, `float`, and `string` arguments. It permits `bool`, `int`, `float`, `string`, and `ModuleObject` results. Constants must match the type declared by `variables()`.
 
-A module function must check its own argument count and any function-specific
-argument types.
-For an invalid function signature it throws `ModuleSignatureError`.
-
-The registry only permits bool, int, float and string arguments. It permits
-bool, int, float, string and ModuleObject results. Constants must match the
-type declared by `variables()`.
-
-
-########################################################################
 ## 7. Adding a new C++ module
-########################################################################
-
-To add a module to Resiris:
 
 1. Implement the `Module` interface.
 2. Add the source file to `CMakeLists.txt`.
 3. Include its header in `src/cli.cpp`.
 4. Register an instance in the vector passed to `ModuleRegistry`.
 5. Add tests and a module reference under `txt/info/`.
-6. Add the module and its reference to the current-module list in
-   `language_reference.txt`, this document, and `README.md`.
+6. Add the module and its reference to the current-module list in [language_reference.md](language_reference.md), this document, and `README.md`.
 
-
-########################################################################
 ## 8. Current limitations
-########################################################################
 
 - Modules are registered by the C++ application.
 - Loading modules from a folder at runtime is not implemented.

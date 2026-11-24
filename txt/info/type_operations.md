@@ -1,154 +1,127 @@
-What is the ".type()" operation?
-    `.type()` is a built-in operation used to get the type of a value or
-    convert it to another type.
+# Type operations
 
-    It is called on a value:
-        value.type()
-        value.type(target_type)
+## `.type()`
 
+`.type()` is a built-in operation used to **get the type** of a value or **convert** it to another type. It is called on a value:
 
-1. How can I get the type of a value?
-    Call `.type()` without an argument. It returns the type name as a string.
+```resiris
+value.type()
+value.type(target_type)
+```
 
-    Example:
-        v number int = 10
-        print_cmd(number.type())
+### How can I get the type of a value?
 
-    Output:
-        int
+Call `.type()` without an argument. It returns the type name as a `string`.
 
-2. Which types can be checked with ".type()"?
-    The current Resiris implementation can return:
-    - int
-    - float
-    - string
-    - bool
-    - ModuleObject
+```resiris
+v number int = 10
+print_cmd(number.type())
 
-    An UnknownObject declaration stores its inferred runtime value type, so
-    scalar and ModuleObject values declared that way can be checked. A
-    FunctionalObject cannot be checked: the interpreter does not infer a
-    type name for it.
+## Output:
+## int
+```
 
-3. How can I convert a value to another type?
-    Give the target type to `.type()`.
+### Which types can be checked with `.type()`?
 
-    Example:
-        v x int = 10
-        v y float = 2.0
+The current Resiris implementation can return:
 
-        print_cmd(x.type(float))
-        print_cmd(y.type(bool))
+- `int`
+- `float`
+- `string`
+- `bool`
+- `ModuleObject`
 
-    The original value does not change. The operation returns a converted
-    value.
+An `UnknownObject` declaration stores its inferred runtime value type, so scalar and `ModuleObject` values declared that way can be checked. A `FunctionalObject` **cannot** be checked: the interpreter does not infer a type name for it.
 
-4. Which target types are supported?
-    - int
-    - float
-    - string
-    - bool
+### How can I convert a value to another type?
 
-5. How does int -> float work?
-    The integer is converted to a floating-point value.
-    Example:
-        10 -> 10.0
+Give the target type to `.type()`. The original value does **not** change — the operation returns a converted value.
 
-6. How does float -> int work?
-    Resiris currently converts `(value + 0.5)` to an integer, truncating
-    toward zero as part of the C++ integer conversion.
+```resiris
+v x int = 10
+v y float = 2.0
 
-    Examples:
-        0.4 -> 0
-        0.5 -> 1
-        1.4 -> 1
-        1.5 -> 2
-        -1.5 -> -1
+print_cmd(x.type(float))
+print_cmd(y.type(bool))
+```
 
-    This is not symmetric rounding for negative values. Out-of-range or
-    non-finite float-to-int conversions are not a supported safe operation.
+### Which target types are supported?
 
-7. How does bool -> int work?
-        true -> 1
-        false -> 0
+`int`, `float`, `string`, and `bool`.
 
-8. How does bool -> float work?
-        true -> 1.0
-        false -> 0.0
+### Conversion rules
 
-9. How does int/float -> string work?
-    The numeric value is converted to its text representation.
+| Conversion | Result |
+| --- | --- |
+| `int → float` | The integer is converted to a floating-point value: `10 → 10.0`. |
+| `float → int` | Resiris converts `(value + 0.5)` to an integer, truncating toward zero as part of the C++ integer conversion. See the examples below. |
+| `bool → int` | `true → 1`, `false → 0` |
+| `bool → float` | `true → 1.0`, `false → 0.0` |
+| `int/float → string` | The numeric value is converted to its text representation. |
+| `bool → string` | `true → "true"`, `false → "false"` |
+| `int/float → bool` | A value greater than `0` becomes `true`. Zero and negative values become `false`. |
+| Same type | The value is returned unchanged. |
 
-10. How does bool -> string work?
-        true -> "true"
-        false -> "false"
+`float → int` examples:
 
-11. How does int/float -> bool work?
-    A value greater than 0 becomes true.
-    Zero and negative values become false.
+```text
+ 0.4 -> 0
+ 0.5 -> 1
+ 1.4 -> 1
+ 1.5 -> 2
+-1.5 -> -1
+```
 
-12. What happens if the value already has the requested type?
-    The value is returned unchanged.
+> [!WARNING]
+> `float → int` is **not** symmetric rounding for negative values. Out-of-range or non-finite float-to-int conversions are not a supported safe operation.
 
-13. Which conversions are not supported?
-    The current implementation does not support:
-    - string -> int
-    - string -> float
-    - string -> bool
-    - ModuleObject -> int/float/string/bool
-    - Other unsupported source types
+### Which conversions are not supported?
 
-    An unsupported conversion gives `ConversionFail`. In particular,
-    FunctionalObject cannot be converted because its source type cannot be
-    inferred by the conversion operation.
+- `string → int`
+- `string → float`
+- `string → bool`
+- `ModuleObject → int/float/string/bool`
+- Other unsupported source types
 
-14. What happens if the target type is invalid?
-    The interpreter reports `TypeError`.
+An unsupported conversion gives `ConversionFail`. In particular, `FunctionalObject` cannot be converted because its source type cannot be inferred by the conversion operation.
 
-15. Can ".type()" take more than one argument?
-    No. It accepts zero arguments for type checking or one argument for
-    conversion.
+### What happens if the target type is invalid?
 
-16. Should the target type be written as a string?
-    No. Write the type name directly:
+The interpreter reports `TypeError`.
 
-        value.type(float)
+### Can `.type()` take more than one argument?
 
-    Not:
+No. It accepts **zero** arguments for type checking or **one** argument for conversion.
 
-        value.type("float")
+### Should the target type be written as a string?
 
+No. Write the type name directly:
 
-########################################################################
-## .string()
-########################################################################
+```resiris
+value.type(float)    ## Correct
+value.type("float")  ## Incorrect
+```
 
-.string():
-    Converts the value into a string. It does not take arguments.
-    It uses the same conversion behaviour as converting to `string`.
+## `.string()`
 
-    Example:
-        v number int = 42
-        print_cmd(number.string())
+`.string()` converts the value into a string. It does **not** take arguments and uses the same conversion behaviour as converting to `string`.
 
+```resiris
+v number int = 42
+print_cmd(number.string())
+```
 
-########################################################################
-## str()
-########################################################################
+## `str()`
 
-str(value):
-    Built-in function that converts a value into text.
+`str(value)` is a built-in function that converts a value into text.
 
-    Example:
-        print_cmd(str(number))
+```resiris
+print_cmd(str(number))
+```
 
-
-########################################################################
 ## Important notes
-########################################################################
 
 - `.type()` does not modify the original variable.
 - Type checking returns a string, not a type object.
-- An UnknownObject containing a scalar or ModuleObject has a determinable
-  runtime type. FunctionalObject does not.
+- An `UnknownObject` containing a scalar or `ModuleObject` has a determinable runtime type; `FunctionalObject` does not.
 - The conversion rules above describe the current Resiris implementation.
