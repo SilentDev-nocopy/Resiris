@@ -170,7 +170,7 @@ Its body can access its own parameters and global variables, but it does **not**
 
 | Topic | Description |
 | --- | --- |
-| Modules | Resiris uses native C++ modules. The CLI currently registers `RSMath`, `RSBase`, `RSConvert`, `RSSignal`, and `RSNetwork`. A program must include a registered module before using it. |
+| Modules | Resiris uses native C++ modules. The CLI currently registers `RSMath`, `RSBase`, `RSConvert`, `RSSignal`, `RSNetwork`, and `RSSystem`. A program must include a registered module before using it. |
 | `<include>` | Includes a registered module. Example: `<include> RSMath, RSBase` |
 | Module functions | Called with the module name and a dot. Example: `RSMath.sqrt(25)` |
 | Module constants | Accessed with square brackets. Example: `RSMath[PI]` |
@@ -184,7 +184,8 @@ See [native_module_system.md](native_module_system.md) for more information.
 - There are no `for` or `while` loops.
 - Continuous execution uses `PROCESS(FPS)`.
 - Modules are registered by the C++ application. They are **not** loaded dynamically from a `Modules` folder.
-- The current Resiris CLI registers `RSMath`, `RSBase`, `RSConvert`, `RSSignal`, and `RSNetwork`.
+- The current Resiris CLI registers `RSMath`, `RSBase`, `RSConvert`, `RSSignal`, `RSNetwork`, and `RSSystem`.
 - `RSSignal` simulates GPIO state in memory on this desktop build; it does not access physical ESP32 hardware.
 - `RSNetwork`'s Wi-Fi functions are ESP32 only and throw a `ModuleError` in the CLI; its HTML server binds to `127.0.0.1`.
+- `RSSystem`'s hardware functions are ESP32 only and throw a `ModuleError` in the CLI; its portable facts work here.
 - `int` uses a signed 64-bit value.

@@ -1,6 +1,8 @@
 #include <cctype>
+#include <chrono>
 #include <csignal>
 #include <cstdio>
+#include <ctime>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
@@ -17,6 +19,8 @@
 #include "resiris/modules/rsmath.hpp"
 #include "resiris/modules/rsnetwork.hpp"
 #include "resiris/modules/rssignal.hpp"
+#include "resiris/modules/rssystem.hpp"
+#include "resiris/platform.hpp"
 #include "resiris/syntax_error.hpp"
 #include "resiris/tokenizer.hpp"
 #include "resiris/version.hpp"
@@ -399,12 +403,38 @@ int run_file(const std::string& source_path, bool show_frontend) {
         Parser parser(tokens);
         Program program = parser.parse();
 
+        // RSSystem.uptime() and RSSystem.cpu_load() read these. The host is the
+        // only part that knows when this run started and how much CPU it used.
+        auto program_start = std::chrono::steady_clock::now();
+        auto cpu_start = std::clock();
+        set_program_clock({
+            [program_start]() -> double {
+                return std::chrono::duration<double>(
+                           std::chrono::steady_clock::now() - program_start)
+                    .count();
+            },
+            [program_start, cpu_start]() -> float {
+                double elapsed = std::chrono::duration<double>(
+                                     std::chrono::steady_clock::now() - program_start)
+                                     .count();
+                if (elapsed <= 0.0) {
+                    return 0.0f;
+                }
+                double cpu = static_cast<double>(std::clock() - cpu_start) / CLOCKS_PER_SEC;
+                double load = cpu / elapsed * 100.0;
+                if (load < 0.0) load = 0.0;
+                if (load > 100.0) load = 100.0;
+                return static_cast<float>(load);
+            },
+        });
+
         auto registry = std::make_shared<ModuleRegistry>(std::vector<std::shared_ptr<Module>>{
             std::make_shared<RsMathModule>(),
             std::make_shared<RsBaseModule>(),
             std::make_shared<RsConvertModule>(),
             std::make_shared<RsSignalModule>(),
             std::make_shared<RsNetworkModule>(),
+            std::make_shared<RsSystemModule>(),
         });
 
         Interpreter interpreter(registry);

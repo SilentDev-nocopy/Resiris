@@ -11,6 +11,7 @@ endif()
 
 add_library(resiris
   src/value.cpp
+  src/platform.cpp
   src/tokenizer.cpp
   src/parser.cpp
   src/interpreter.cpp
@@ -19,6 +20,7 @@ add_library(resiris
   src/modules/rsconvert.cpp
   src/modules/rssignal.cpp
   src/modules/rsnetwork.cpp
+  src/modules/rssystem.cpp
 )
 target_include_directories(resiris PUBLIC include)
 target_compile_options(resiris PRIVATE -Wall -Wextra)
@@ -52,6 +54,7 @@ add_executable(resiris-tests
   tests/test_rsconvert.cpp
   tests/test_rssignal.cpp
   tests/test_rsnetwork.cpp
+  tests/test_rssystem.cpp
 )
 target_link_libraries(resiris-tests PRIVATE resiris)
 target_include_directories(resiris-tests PRIVATE third_party)

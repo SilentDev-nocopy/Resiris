@@ -18,6 +18,8 @@ namespace resiris {
 // module error message.
 class ModuleSignatureError {};
 
+class ModuleRegistry;
+
 // A native Resiris module (C++ port of the Python prototype modules).
 class Module {
 public:
@@ -40,6 +42,13 @@ public:
     // wrong exported type.
     virtual Value get_constant(const std::string& name) const = 0;
 
+    // Called once by the registry after construction. A module that needs to
+    // know what else is registered (RSSystem) asks here, so it can stay
+    // default-constructible like every other module.
+    virtual void on_registered(ModuleRegistry& registry) {
+        (void)registry;
+    }
+
     bool has_function(const std::string& fn) const {
         for (const auto& name : function_names()) {
             if (name == fn) {
@@ -58,6 +67,20 @@ public:
         for (auto& module : modules) {
             available_[module->module_name()] = std::move(module);
         }
+        for (auto& entry : available_) {
+            entry.second->on_registered(*this);
+        }
+    }
+
+    // Every registered module name, in the map's own key order. This includes
+    // modules the script never includes: the answer is what the build offers.
+    std::vector<std::string> module_names() const {
+        std::vector<std::string> names;
+        names.reserve(available_.size());
+        for (const auto& entry : available_) {
+            names.push_back(entry.first);
+        }
+        return names;
     }
 
     bool is_loaded(const std::string& module_name) const {

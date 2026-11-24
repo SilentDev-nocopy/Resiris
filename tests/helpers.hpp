@@ -18,6 +18,8 @@
 #include "resiris/modules/rsmath.hpp"
 #include "resiris/modules/rsnetwork.hpp"
 #include "resiris/modules/rssignal.hpp"
+#include "resiris/modules/rssystem.hpp"
+#include "resiris/platform.hpp"
 #include "resiris/syntax_error.hpp"
 #include "resiris/tokenizer.hpp"
 #include "resiris/value.hpp"
@@ -36,12 +38,19 @@ inline resiris::Program parse(const std::string& source) {
 }
 
 inline std::shared_ptr<resiris::ModuleRegistry> make_registry() {
+    // Deterministic clock for RSSystem tests; the CLI installs a real one.
+    resiris::set_program_clock({
+        [] { return 1.25; },
+        [] { return 12.5f; },
+    });
+
     std::vector<std::shared_ptr<resiris::Module>> modules;
     modules.push_back(std::make_shared<resiris::RsMathModule>());
     modules.push_back(std::make_shared<resiris::RsBaseModule>());
     modules.push_back(std::make_shared<resiris::RsConvertModule>());
     modules.push_back(std::make_shared<resiris::RsSignalModule>());
     modules.push_back(std::make_shared<resiris::RsNetworkModule>());
+    modules.push_back(std::make_shared<resiris::RsSystemModule>());
     return std::make_shared<resiris::ModuleRegistry>(std::move(modules));
 }
 

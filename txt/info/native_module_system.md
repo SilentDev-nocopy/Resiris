@@ -11,11 +11,12 @@ Current modules:
 - `RSConvert`
 - `RSSignal`
 - `RSNetwork`
+- `RSSystem`
 
 The modules are **compiled into the application**. Resiris does not load module files dynamically from a `Modules` folder.
 
 > [!NOTE]
-> The CLI is a desktop program. In this build `RSSignal` is a stateful simulation; it does not access physical ESP32 pins or an ADC. See [rssignal_module.md](rssignal_module.md) for its simulated behavior and [esp32_gpio_table.md](esp32_gpio_table.md) for hardware planning information. `RSNetwork`'s Wi-Fi functions throw a `ModuleError` on the CLI; its HTML server works on `127.0.0.1`. See [rsnetwork_module.md](rsnetwork_module.md).
+> The CLI is a desktop program. In this build `RSSignal` is a stateful simulation; it does not access physical ESP32 pins or an ADC. See [rssignal_module.md](rssignal_module.md) for its simulated behavior and [esp32_gpio_table.md](esp32_gpio_table.md) for hardware planning information. `RSNetwork`'s Wi-Fi functions throw a `ModuleError` on the CLI; its HTML server works on `127.0.0.1`. See [rsnetwork_module.md](rsnetwork_module.md). `RSSystem`'s hardware functions throw a `ModuleError` on the CLI; its portable functions work here. See [rssystems_module.md](rssystems_module.md).
 
 ## 2. Including a module
 
@@ -73,6 +74,10 @@ A C++ module implements the `Module` interface from `include/resiris/module.hpp`
 - `get_constant(...)`
 
 Object method names must also appear in `function_names()`. The CLI constructs the modules explicitly in `src/cli.cpp`.
+
+A module can override `on_registered(ModuleRegistry&)`, which the registry calls once after construction. `RSSystem` uses it to learn the full module list for `RSSystem.modules()`. The registry also exposes `module_names()` for that purpose.
+
+Host-provided measurements are not constructor arguments: `include/resiris/platform.hpp` lets the application install a program clock (seconds since the run started and CPU load percentage). `RSSystem` reads it through `has_program_clock()`, `program_seconds()`, and `program_cpu_load()`; the CLI installs a real clock in `src/cli.cpp`.
 
 The module provides its exported constants through `variables()` and `get_constant()`. The type declared in `variables()` is checked against the returned value.
 

@@ -26,7 +26,7 @@ More programs are in `examples/`; the timer demos run until Ctrl+C. `resiris --h
 
 ## Modules
 
-The CLI registers `RSMath`, `RSBase`, `RSConvert`, `RSSignal`, and `RSNetwork`. `RSNetwork`'s Wi-Fi API is ESP32 only and raises an error in the CLI; its HTML server binds to `127.0.0.1`. See [`txt/info/`](txt/info/) for each module's reference.
+The CLI registers `RSMath`, `RSBase`, `RSConvert`, `RSSignal`, `RSNetwork`, and `RSSystem`. `RSNetwork`'s Wi-Fi API and `RSSystem`'s hardware functions are ESP32 only and raise an error in the CLI; the HTML server binds to `127.0.0.1`. See [`txt/info/`](txt/info/) for each module's reference.
 
 ## Install / uninstall
 
