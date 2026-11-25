@@ -60,7 +60,7 @@ The 29 function names are: `abs`, `sqrt`, `cbrt`, `pow`, `floor`, `ceil`, `round
 - A wrong argument count or type raises the standard module signature error.
 
 > [!WARNING]
-> Integer results use signed 64-bit `int`. The implementation does **not** validate integer overflow in `factorial`, combinations, permutations, or least common multiple — keep inputs small enough that the result fits. `clamp` expects `low <= high`.
+> Integer results use signed 64-bit `int`. The implementation does **not** validate integer overflow in `factorial`, combinations, permutations, or least common multiple - keep inputs small enough that the result fits. `clamp` expects `low <= high`.
 
 ## Example
 

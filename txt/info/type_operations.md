@@ -35,7 +35,7 @@ An `UnknownObject` declaration stores its inferred runtime value type, so scalar
 
 ### How can I convert a value to another type?
 
-Give the target type to `.type()`. The original value does **not** change — the operation returns a converted value.
+Give the target type to `.type()`. The original value does **not** change - the operation returns a converted value.
 
 ```resiris
 v x int = 10

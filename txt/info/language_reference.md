@@ -6,7 +6,7 @@ This reference follows the **current** Resiris implementation. A feature that wa
 
 ### Comments and indentation
 
-- `##` starts a comment — the tokenizer ignores the whole line.
+- `##` starts a comment - the tokenizer ignores the whole line.
 - Code blocks use **tab-based indentation**. A leading space is not a valid substitute for a tab.
 - Text examples in this reference may use visual spaces; source files must use tabs for indentation.
 - Statements end at a newline.
@@ -82,7 +82,7 @@ mat value:
 ### Typed assignment
 
 - `int` accepts `int` values.
-- `float` accepts `float` and `int` values — an `int` is converted to `float`.
+- `float` accepts `float` and `int` values - an `int` is converted to `float`.
 - `string` accepts `string` values only.
 - `bool` accepts `bool` values only.
 - `ModuleObject` and `FunctionalObject` accept their matching value types.

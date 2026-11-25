@@ -101,7 +101,7 @@ If PyResy is not next to this checkout, set `RESIRIS_PROTOTYPE_DIR`.
 
 ## Documentation
 
-- [`txt/info/`](txt/info/) — syntax, types, modules, hardware notes
-- [`txt/ideas/`](txt/ideas/) — design notes
-- [Galena](https://github.com/SilentDev-nocopy/Galena.git) — the device this
+- [`txt/info/`](txt/info/) - syntax, types, modules, hardware notes
+- [`txt/ideas/`](txt/ideas/) - design notes
+- [Galena](https://github.com/SilentDev-nocopy/Galena.git) - the device this
   language was written for

@@ -1,4 +1,4 @@
-# Custom calculator — components
+# Custom calculator - components
 
 The goal is a custom, programmable scientific calculator, mainly for school and home use.
 
@@ -90,10 +90,10 @@ Not yet selected. We will first build and measure the prototype's power consumpt
 
 ## 7. Additional components
 
-- Breadboard — for the first prototype
-- Jumper/Dupont wires — for wiring
-- PCB — only after the working prototype
-- Case — later, likely a custom/3D-printed design
+- Breadboard - for the first prototype
+- Jumper/Dupont wires - for wiring
+- PCB - only after the working prototype
+- Case - later, likely a custom/3D-printed design
 
 ## Planned main components
 

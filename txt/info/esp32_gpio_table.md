@@ -3,14 +3,14 @@
 This table groups the GPIO pins of the ESP32-WROOM-32 module by **primary recommended use**. Each listed GPIO appears in exactly one group.
 
 > [!IMPORTANT]
-> This table applies to the ESP32-WROOM-32 module specified in the project. The exact pinout of the development board may differ from board to board — check the board's silkscreen and schematic before wiring.
+> This table applies to the ESP32-WROOM-32 module specified in the project. The exact pinout of the development board may differ from board to board - check the board's silkscreen and schematic before wiring.
 
 > [!NOTE]
 > This is a **hardware reference**, not a description of Resiris's desktop `RSSignal` module. The desktop CLI only simulates GPIO state in memory; it does not read or control physical pins. See [`rssignal_module.md`](rssignal_module.md).
 
 GPIO numbers are the chip's **logical pins**. They are not the same as the physical connector positions on the board.
 
-The table contains the module's 26 GPIOs used in the project and broken out for general use — not every GPIO number exists or is accessible on the module:
+The table contains the module's 26 GPIOs used in the project and broken out for general use - not every GPIO number exists or is accessible on the module:
 
 - **GPIO6–GPIO11**: connected to the module's flash memory.
 - **GPIO37 and GPIO38**: not accessible on the module.
@@ -28,10 +28,10 @@ Do not include these in the program's list of freely usable GPIOs.
 
 **Primary grouping:**
 
-- `ADC1_WIFI_SAFE_GPIOS` — the primary group for analog inputs; ADC1 can be used even while Wi-Fi is active.
-- `BOOTSTRAP_GPIOS` — the state of these pins during boot can affect startup. Only load them with external circuitry after checking the board's startup requirements.
-- `UART0_GPIOS` — the default serial communication pin pair; during development they are usually used for flashing and debugging.
-- `GENERAL_DIGITAL_GPIOS` — in this project, these can primarily be reserved for digital I/O tasks.
+- `ADC1_WIFI_SAFE_GPIOS` - the primary group for analog inputs; ADC1 can be used even while Wi-Fi is active.
+- `BOOTSTRAP_GPIOS` - the state of these pins during boot can affect startup. Only load them with external circuitry after checking the board's startup requirements.
+- `UART0_GPIOS` - the default serial communication pin pair; during development they are usually used for flashing and debugging.
+- `GENERAL_DIGITAL_GPIOS` - in this project, these can primarily be reserved for digital I/O tasks.
 
 ## 2. Pin-by-pin capabilities and limitations
 
@@ -70,7 +70,7 @@ Do not include these in the program's list of freely usable GPIOs.
 
 GPIO32, GPIO33, GPIO34, GPIO35, GPIO36, GPIO39
 
-These are the recommended analog input pins when the device also uses Wi-Fi. GPIO34, GPIO35, GPIO36 and GPIO39 are **input only** — do not plan digital outputs on them. They have no software-switchable internal pull-up or pull-down resistor.
+These are the recommended analog input pins when the device also uses Wi-Fi. GPIO34, GPIO35, GPIO36 and GPIO39 are **input only** - do not plan digital outputs on them. They have no software-switchable internal pull-up or pull-down resistor.
 
 ### `BOOTSTRAP_GPIOS`
 
@@ -102,7 +102,7 @@ These default assignments can be remapped to other GPIOs.
 
 GPIO4, GPIO13, GPIO14, GPIO25, GPIO26 and GPIO27 also have ADC2 functionality. ADC2 analog measurements are limited when Wi-Fi is in use, so for an analog sensor with Wi-Fi active, prefer the `ADC1_WIFI_SAFE_GPIOS` group. GPIO13 and GPIO14 can also be used for JTAG; GPIO25 and GPIO26 are DAC-capable, but the current project does not need a DAC.
 
-## 4. Power supply — these are not GPIOs
+## 4. Power supply - these are not GPIOs
 
 | Board label | Role |
 | --- | --- |

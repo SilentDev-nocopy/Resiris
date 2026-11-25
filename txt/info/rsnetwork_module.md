@@ -13,9 +13,9 @@
 
 | Constant | Type | Value |
 | --- | --- | --- |
-| `ROUTEMODE_CRE` | `string` | `"CRE"` — connect to an existing router (station mode) |
-| `ROUTEMODE_SR` | `string` | `"SR"` — self router (access point mode) |
-| `ROUTEMODE_MB` | `string` | `"MB"` — man in between (station + access point) |
+| `ROUTEMODE_CRE` | `string` | `"CRE"` - connect to an existing router (station mode) |
+| `ROUTEMODE_SR` | `string` | `"SR"` - self router (access point mode) |
+| `ROUTEMODE_MB` | `string` | `"MB"` - man in between (station + access point) |
 
 Access them with square brackets: `RSNetwork[ROUTEMODE_CRE]`.
 
