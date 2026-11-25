@@ -2,6 +2,6 @@
 
 namespace resiris {
 
-constexpr const char* kVersion = "1.9-cpp";
+constexpr const char* kVersion = "1.10-cpp";
 
 } // namespace resiris
